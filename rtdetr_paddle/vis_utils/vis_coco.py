@@ -4,11 +4,8 @@ import os
 import multiprocessing
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 from tqdm import tqdm
-
-
-def create_folder(path):
-    os.makedirs(path, exist_ok=True)
-    return path
+from multiprocessing import Process
+from utils.io.common import create_folder, join
 
 class VisCoCo(COCO):
     def __init__(self, annotation_file, images_folder, bbox_vis_folder=None, rotate_bbox_vis_folder=None):
@@ -26,6 +23,13 @@ class VisCoCo(COCO):
         self.categories_id2name, self.categories_name2id = dict(), dict()
         self.cat_name_cat_id()
         self.file_name_img_id()
+        self.draw_text = True
+        self.fontsize = 40
+        if self.draw_text:
+            try:
+                self.font = ImageFont.truetype('arial.ttf', self.fontsize)
+            except IOError:
+                self.font = ImageFont.load_default()
 
 
     def visualize_bboxes_in_images(self):
@@ -33,9 +37,14 @@ class VisCoCo(COCO):
         多张图片可视化水平框
         """
         files_path = self.get_files_path()
-        # multiprocessing.Pool(8) # 创建8个进程，提高代码处理效率
-        with multiprocessing.Pool(8) as pool:
-            list(tqdm(pool.imap(self.visualize_bboxes_in_image, [(file_path) for file_path in sorted(files_path) if os.path.basename(file_path) in self.file_name2img_id.keys()]), total=len(files_path), desc="vis bbox"))
+        vis = []
+        for i in tqdm(range(len(sorted(files_path))), total=len(files_path), desc="vis bbox"):
+            if  os.path.basename(files_path[i]) in self.file_name2img_id.keys():
+                vis.append(Process(target=self.visualize_bboxes_in_image, args=(files_path[i],)))
+                vis[i].start()
+        for i in range(len(sorted(files_path))):
+            if  os.path.basename(files_path[i]) in self.file_name2img_id.keys():
+                vis[i].join()
         
 
     def visualize_bboxes_in_image(self, file_path):
@@ -44,10 +53,10 @@ class VisCoCo(COCO):
         """
         file_name = os.path.basename(file_path)
         image_id = self.file_name2img_id[file_name]
-        save_image_path = os.path.join(self.bbox_vis_folder, file_name)
+        save_image_path = join(self.bbox_vis_folder, file_name)
         image_info = self.loadImgs(image_id)[0]
         file_name = image_info['file_name']
-        img_path = os.path.join(self.images_folder, file_name)
+        img_path = join(self.images_folder, file_name)
         image = Image.open(img_path).convert('RGB')
         image = ImageOps.exif_transpose(image)
         # 获取这张图片的ann
@@ -63,9 +72,6 @@ class VisCoCo(COCO):
         """
         Draw bbox on image 分别可视化bbox和label是为了文字不被挡住
         """
-        font_path = "/usr/share/fonts/truetype/noto/NotoMono-Regular.ttf"
-        font_size = 40
-        font = ImageFont.truetype(font_path, font_size, encoding="utf-8")
         draw = ImageDraw.Draw(image)
         for ann in annotations:
             bbox = ann['bbox']
@@ -93,14 +99,14 @@ class VisCoCo(COCO):
                 catname = ann['category_name']
                 text = "{}".format(catname)
             # tw, th = draw.textsize(text)
-            left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
+            left, top, right, bottom = draw.textbbox((0, 0), text, font=self.font)
             tw, th = right - left, bottom - top
             #label框
             draw.rectangle([(xmin + 1, ymin + 1), (xmin + tw + 1, ymin + th + 1 + 10)], fill='white') 
             # draw.rectangle([(xmin + 1, ymin - th), (xmin + tw + 1, ymin)], fill = color)
             # label文字 
             # (xmin + 1, ymin - th)
-            draw.text((xmin + 1, ymin + 1), text, fill='red', font=font) 
+            draw.text((xmin + 1, ymin + 1), text, fill='red', font=self.font) 
             # draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255))
         return image
     
@@ -110,9 +116,14 @@ class VisCoCo(COCO):
         多张图片可视化旋转框
         """
         files_path = self.get_files_path()
-        # multiprocessing.Pool(8) # 创建8个进程，提高代码处理效率
-        with multiprocessing.Pool(8) as pool:
-            list(tqdm(pool.imap(self.visualize_rotate_bboxes_in_image, [(file_path) for file_path in sorted(files_path) if os.path.basename(file_path) in self.file_name2img_id.keys()]), total=len(files_path), desc="vis rotation bbox"))
+        vis = []
+        for i in tqdm(range(len(sorted(files_path))), total=len(files_path), desc="vis rotation bbox"):
+            if  os.path.basename(files_path[i]) in self.file_name2img_id.keys():
+                vis.append(Process(target=self.visualize_rotate_bboxes_in_image, args=(files_path[i],)))
+                vis[i].start()
+        for i in range(len(sorted(files_path))):
+            if  os.path.basename(files_path[i]) in self.file_name2img_id.keys():
+                vis[i].join()
 
 
     def visualize_rotate_bboxes_in_image(self, file_path):
@@ -121,10 +132,10 @@ class VisCoCo(COCO):
         """
         file_name = os.path.basename(file_path)
         image_id = self.file_name2img_id[file_name]
-        save_image_path = os.path.join(self.rotate_bbox_vis_folder, file_name)
+        save_image_path = join(self.rotate_bbox_vis_folder, file_name)
         image_info = self.loadImgs(image_id)[0]
         file_name = image_info['file_name']
-        img_path = os.path.join(self.images_folder, file_name)
+        img_path = join(self.images_folder, file_name)
         image = Image.open(img_path).convert('RGB')
         image = ImageOps.exif_transpose(image)
         # 获取这张图片的ann
@@ -140,9 +151,6 @@ class VisCoCo(COCO):
         """
         Draw bbox on image 分别可视化bbox和label是为了文字不被挡住
         """
-        font_path = "/usr/share/fonts/truetype/noto/NotoMono-Regular.ttf"
-        font_size = 50
-        font = ImageFont.truetype(font_path, font_size, encoding="utf-8")
         draw = ImageDraw.Draw(image)
         for ann in annotations:
             rotate_bbox = ann['segmentation']
@@ -172,14 +180,14 @@ class VisCoCo(COCO):
                 catname = ann['category_name']
                 text = "{}".format(catname)
             # tw, th = draw.textsize(text)
-            left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
+            left, top, right, bottom = draw.textbbox((0, 0), text, font=self.font)
             tw, th = right - left, bottom - top
             #label框
             draw.rectangle([(xmin + 1, ymin + 1), (xmin + tw + 1, ymin + th + 1 + 10)], fill='white') 
             # draw.rectangle([(xmin + 1, ymin - th), (xmin + tw + 1, ymin)], fill = color)
             # label文字 
             # (xmin + 1, ymin - th)
-            draw.text((xmin + 1, ymin + 1), text, fill='red',font=font) 
+            draw.text((xmin + 1, ymin + 1), text, fill='red',font=self.font) 
             # draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255))
         return image
     
@@ -217,11 +225,6 @@ class VisCoCo(COCO):
             for cat in self.dataset["categories"]:
                 self.categories_id2name[cat['id']] = cat["name"]
                 self.categories_name2id[cat['name']] = cat["id"]
-      
-        
-class Vis_Prediction:
-    def __init__(self) -> None:
-        pass
 
 
 if __name__ == "__main__":

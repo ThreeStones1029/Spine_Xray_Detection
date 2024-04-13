@@ -279,7 +279,7 @@ if __name__ == "__main__":
     # split_train_dataset_to_no_label_and_label("datasets/miccai/xray/images/train_instance",
     #                                           "datasets/miccai/xray/images/train_instance_60",
     #                                           "datasets/miccai/xray/images/train_instance_20")
-    random_split_coco_dataset("datasets/spine_fracture/images",
-                              "datasets/spine_fracture/annotations/fracture_gt_bbox.json",
-                              "datasets/spine_fracture/split_dataset",
+    random_split_coco_dataset("datasets/fracture_dataset/images",
+                              "datasets/fracture_dataset/annotations/semantic.json",
+                              "datasets/fracture_dataset/split_dataset",
                               {"train": 0.6, "val": 0.2, "test": 0.2})

@@ -1,0 +1,8 @@
+rtdetr_paddle/datasets/
+rtdetr_paddle/infer_output
+rtdetr_paddle/output/
+rtdetr_paddle/bbox_pr_curve/
+rtdetr_paddle/eval
+rtdetr_paddle/log
+rtdetr_paddle/vdl_dir
+rtdetr_paddle/train_and_predict.md

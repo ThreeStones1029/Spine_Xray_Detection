@@ -10,8 +10,8 @@ TrainDataset:
 
 EvalDataset:
   name: COCODataSet
-  image_dir: val
-  anno_path: annotations/semantic_bbox_val.json
+  image_dir: test
+  anno_path: annotations/semantic_bbox_test.json
   dataset_dir: datasets/fracture_dataset
   allow_empty: true
 

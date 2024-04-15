@@ -201,6 +201,6 @@ def modify_json_name(json_path):
 
 if __name__ == '__main__':
     FLAGS = parse_args()
-    FLAGS.output_eval = 'eval/BUU/specific1167'
+    FLAGS.output_eval = 'eval/fracture_dataset'
     main(FLAGS)
     modify_json_name(FLAGS.output_eval)

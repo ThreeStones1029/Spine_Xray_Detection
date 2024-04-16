@@ -8,7 +8,10 @@ from collections import OrderedDict
 
 from .common import get_activation, ConvNormLayer, FrozenBatchNorm2d
 
-__all__ = ['ResNet', ]
+from src.core import register
+
+
+__all__ = ['PResNet']
 
 
 ResNet_cfg = {
@@ -16,7 +19,15 @@ ResNet_cfg = {
     34: [3, 4, 6, 3],
     50: [3, 4, 6, 3],
     101: [3, 4, 23, 3],
-    152: [3, 8, 36, 3],
+    # 152: [3, 8, 36, 3],
+}
+
+
+donwload_url = {
+    18: 'https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet18_vd_pretrained_from_paddle.pth',
+    34: 'https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet34_vd_pretrained_from_paddle.pth',
+    50: 'https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet50_vd_ssld_v2_pretrained_from_paddle.pth',
+    101: 'https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet101_vd_ssld_pretrained_from_paddle.pth',
 }
 
 
@@ -40,6 +51,7 @@ class BasicBlock(nn.Module):
         self.branch2a = ConvNormLayer(ch_in, ch_out, 3, stride, act=act)
         self.branch2b = ConvNormLayer(ch_out, ch_out, 3, 1, act=None)
         self.act = nn.Identity() if act is None else get_activation(act) 
+
 
     def forward(self, x):
         out = self.branch2a(x)
@@ -126,7 +138,8 @@ class Blocks(nn.Module):
         return out
 
 
-class ResNet(nn.Module):
+@register
+class PResNet(nn.Module):
     def __init__(
         self, 
         depth, 
@@ -134,8 +147,9 @@ class ResNet(nn.Module):
         num_stages=4, 
         return_idx=[0, 1, 2, 3], 
         act='relu',
-        freeze_at=0, 
-        freeze_norm=True):
+        freeze_at=-1, 
+        freeze_norm=True, 
+        pretrained=False):
         super().__init__()
 
         block_nums = ResNet_cfg[depth]
@@ -179,6 +193,11 @@ class ResNet(nn.Module):
         if freeze_norm:
             self._freeze_norm(self)
 
+        if pretrained:
+            state = torch.hub.load_state_dict_from_url(donwload_url[depth])
+            self.load_state_dict(state)
+            print(f'Load PResNet{depth} state_dict')
+            
     def _freeze_parameters(self, m: nn.Module):
         for p in m.parameters():
             p.requires_grad = False
@@ -202,4 +221,5 @@ class ResNet(nn.Module):
             if idx in self.return_idx:
                 outs.append(x)
         return outs
+
 

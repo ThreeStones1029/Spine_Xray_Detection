@@ -2,7 +2,7 @@
 Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 https://github.com/facebookresearch/detr/blob/main/engine.py
 
-by lyuwenyu
+by lyuwenyu and ThreeStones1029
 """
 
 import math

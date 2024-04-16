@@ -4,7 +4,7 @@
  * @Author: ThreeStones1029 2320218115@qq.com
  * @Date: 2024-04-16 02:22:36
  * @LastEditors: ShuaiLei
- * @LastEditTime: 2024-04-16 14:46:10
+ * @LastEditTime: 2024-04-16 15:01:56
 -->
 ## TODO
 <details>
@@ -12,6 +12,7 @@
 
 - [x] Training
 - [x] Evaluation
+- [x] Predict
 - [x] Export onnx
 - [x] Upload source code
 - [x] Upload weight convert from paddle, see [*links*](https://github.com/lyuwenyu/RT-DETR/issues/42)
@@ -72,6 +73,10 @@ python tools/train.py -c configs/rtdetr/rtdetr_r50vd_6x_coco.yml
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 torchrun --nproc_per_node=4 tools/train.py -c configs/rtdetr/rtdetr_r50vd_6x_coco.yml
 ```
+</details>
+
+<details>
+<summary>Evaluation</summary>
 
 - Evaluation on Single GPUs:
 ```shell

@@ -91,6 +91,14 @@ class YAMLConfig(BaseConfig):
 
         return self._val_dataloader
     
+    @property
+    def test_dataloader(self, ):
+        if self._test_dataloader is None and 'test_dataloader' in self.yaml_cfg:
+            merge_config(self.yaml_cfg)
+            self._test_dataloader = create('test_dataloader')
+            self._test_dataloader.shuffle = self.yaml_cfg['test_dataloader'].get('shuffle', False)
+
+        return self._test_dataloader
     
     @property
     def ema(self, ):

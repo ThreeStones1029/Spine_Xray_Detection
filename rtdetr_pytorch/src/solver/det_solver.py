@@ -4,7 +4,7 @@ version:
 Author: ThreeStones1029 2320218115@qq.com
 Date: 2024-04-16 02:22:36
 LastEditors: ShuaiLei
-LastEditTime: 2024-04-16 06:01:45
+LastEditTime: 2024-04-16 08:02:31
 '''
 '''
 by lyuwenyu
@@ -19,7 +19,7 @@ from src.misc import dist
 from src.data import get_coco_api_from_dataset
 
 from .solver import BaseSolver
-from .det_engine import train_one_epoch, evaluate
+from .det_engine import train_one_epoch, evaluate, predict
 
 
 class DetSolver(BaseSolver):
@@ -94,14 +94,17 @@ class DetSolver(BaseSolver):
 
     def val(self, ):
         self.eval()
-
         base_ds = get_coco_api_from_dataset(self.val_dataloader.dataset)
-        
         module = self.ema.module if self.ema else self.model
         test_stats, coco_evaluator = evaluate(module, self.criterion, self.postprocessor,
-                self.val_dataloader, base_ds, self.device, self.output_dir)
-                
+                self.val_dataloader, base_ds, self.device, self.output_dir)     
         if self.output_dir:
             dist.save_on_master(coco_evaluator.coco_eval["bbox"].eval, self.output_dir / "eval.pth")
-        
+        return
+    
+
+    def infer(self, infer_output_dir):
+        self.test()
+        module = self.ema.module if self.ema else self.model
+        predict(module, self.criterion, self.postprocessor,self.test_dataloader, self.device, infer_output_dir)     
         return

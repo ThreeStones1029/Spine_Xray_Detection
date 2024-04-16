@@ -4,7 +4,7 @@ version:
 Author: ThreeStones1029 2320218115@qq.com
 Date: 2024-04-16 02:22:37
 LastEditors: ShuaiLei
-LastEditTime: 2024-04-16 07:50:27
+LastEditTime: 2024-04-16 07:30:07
 '''
 import os 
 import sys 
@@ -29,7 +29,7 @@ def main(args, ) -> None:
         tuning=args.tuning
     )
     solver = TASKS[cfg.yaml_cfg['task']](cfg)
-    solver.infer(args.infer_output_dir)
+    solver.val()
     
 
 
@@ -38,7 +38,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', '-c', type=str, default="configs/rtdetr/rtdetr_r50vd_6x_coco.yml")
     parser.add_argument('--resume', '-r', type=str, default="output/test/rtdetr_r50vd_6x_coco/best_checkpoint.pth")
-    parser.add_argument('--infer_output_dir', type=str, default="infer_output/test")
     parser.add_argument('--tuning', '-t', type=str, )
     parser.add_argument('--amp', action='store_true', default=False,)
     args = parser.parse_args()

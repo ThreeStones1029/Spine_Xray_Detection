@@ -4,7 +4,7 @@ version:
 Author: ThreeStones1029 2320218115@qq.com
 Date: 2024-04-16 02:22:37
 LastEditors: ShuaiLei
-LastEditTime: 2024-04-16 06:18:00
+LastEditTime: 2024-04-16 07:30:35
 '''
 """by lyuwenyu
 """
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     parser.add_argument('--config', '-c', type=str, )
     parser.add_argument('--resume', '-r', type=str, )
     parser.add_argument('--tuning', '-t', type=str, )
-    parser.add_argument('--test-only', action='store_true', default=True,)
+    parser.add_argument('--test-only', action='store_true', default=False,)
     parser.add_argument('--amp', action='store_true', default=False,)
     args = parser.parse_args()
     main(args)

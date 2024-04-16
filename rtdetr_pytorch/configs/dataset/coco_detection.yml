@@ -32,3 +32,19 @@ val_dataloader:
   batch_size: 8
   num_workers: 4
   drop_last: False
+
+
+test_dataloader:
+  type: DataLoader
+  dataset: 
+    type: CocoDetection
+    img_folder: ../rtdetr_paddle/datasets/fracture_dataset/test/
+    ann_file: ../rtdetr_paddle/datasets/fracture_dataset/annotations/semantic_bbox_test.json
+    transforms:
+      type: Compose
+      ops: ~ 
+
+  shuffle: False
+  batch_size: 8
+  num_workers: 4
+  drop_last: False

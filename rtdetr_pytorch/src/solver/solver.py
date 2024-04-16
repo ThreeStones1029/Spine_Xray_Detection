@@ -66,6 +66,15 @@ class BaseSolver(object):
             print(f'resume from {self.cfg.resume}')
             self.resume(self.cfg.resume)
 
+    def test(self, ):
+        self.setup()
+        self.test_dataloader = dist.warp_loader(self.cfg.test_dataloader, \
+            shuffle=self.cfg.test_dataloader.shuffle)
+
+        if self.cfg.resume:
+            print(f'resume from {self.cfg.resume}')
+            self.resume(self.cfg.resume)
+
 
     def state_dict(self, last_epoch):
         '''state dict

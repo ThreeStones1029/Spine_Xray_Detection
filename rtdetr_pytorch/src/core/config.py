@@ -32,19 +32,24 @@ class BaseConfig(object):
         self._lr_scheduler :LRScheduler = None 
         self._train_dataloader :DataLoader = None 
         self._val_dataloader :DataLoader = None 
+        self._test_dataloader :DataLoader = None
         self._ema :nn.Module = None 
         self._scaler :GradScaler = None 
 
         self.train_dataset :Dataset = None
         self.val_dataset :Dataset = None
+        self.test_dataset :Dataset = None
         self.num_workers :int = 0
         self.collate_fn :Callable = None
 
         self.batch_size :int = None
         self._train_batch_size :int = None
         self._val_batch_size :int = None
+        self._test_batch_size :int = None
         self._train_shuffle: bool = None  
-        self._val_shuffle: bool = None 
+        self._val_shuffle: bool = None
+        self._test_shuffle: bool = None 
+ 
 
         self.evaluator :Callable[[nn.Module, DataLoader, str], ] = None
 
@@ -156,6 +161,24 @@ class BaseConfig(object):
     def val_dataloader(self, loader):
         self._val_dataloader = loader 
 
+    @property
+    def test_dataloader(self):
+        if self._test_dataloader is None and self.test_dataset is not None:
+            loader = DataLoader(self.test_dataset, 
+                                batch_size=self.test_batch_size, 
+                                num_workers=self.num_workers, 
+                                drop_last=False,
+                                collate_fn=self.collate_fn, 
+                                shuffle=self.test_shuffle)
+            loader.shuffle = self.test_shuffle
+            self._test_dataloader = loader
+
+        return self._test_dataloader
+    
+    @test_dataloader.setter
+    def test_dataloader(self, loader):
+        self._test_dataloader = loader 
+
 
     # TODO method
     # @property
@@ -208,6 +231,18 @@ class BaseConfig(object):
         assert isinstance(shuffle, bool), 'shuffle must be bool'
         self._train_shuffle = shuffle
 
+    @property
+    def test_shuffle(self):
+        if self._test_shuffle is None:
+            print('warning: set default test_shuffle=True')
+            return True
+        return self._test_shuffle
+
+    @test_shuffle.setter
+    def test_shuffle(self, shuffle):
+        assert isinstance(shuffle, bool), 'shuffle must be bool'
+        self._test_shuffle = shuffle
+
 
     @property
     def train_batch_size(self):
@@ -232,6 +267,18 @@ class BaseConfig(object):
     def val_batch_size(self, batch_size):
         assert isinstance(batch_size, int), 'batch_size must be int'
         self._val_batch_size = batch_size
+
+    @property
+    def test_batch_size(self):
+        if self._test_batch_size is None:
+            print(f'warning: set test_batch_size=batch_size={self.batch_size}')
+            return self.batch_size
+        return self._test_batch_size
+
+    @test_batch_size.setter
+    def test_batch_size(self, batch_size):
+        assert isinstance(batch_size, int), 'batch_size must be int'
+        self._test_batch_size = batch_size
 
 
     @property

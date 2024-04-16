@@ -187,4 +187,30 @@ def evaluate(model: torch.nn.Module, criterion: torch.nn.Module, postprocessors,
     return stats, coco_evaluator
 
 
+@torch.no_grad()
+def predict(model: torch.nn.Module, criterion: torch.nn.Module, postprocessors, data_loader, device, infer_output_dir):
+    model.eval()
+    criterion.eval()
+    # metric_logger = MetricLogger(delimiter="  ")
+    # metric_logger.add_meter('class_error', SmoothedValue(window_size=1, fmt='{value:.2f}'))
+    # header = 'Test:'
 
+    # for samples, targets in metric_logger.log_every(data_loader, 10, header):
+    for samples, targets in data_loader:
+        samples = samples.to(device)
+        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+
+        # with torch.autocast(device_type=str(device)):
+        #     outputs = model(samples)
+
+        outputs = model(samples)
+        orig_target_sizes = torch.stack([t["orig_size"] for t in targets], dim=0)        
+        results = postprocessors(outputs, orig_target_sizes)
+        res = {target['image_id'].item(): output for target, output in zip(targets, results)}
+
+        for image_id, batch_result in res.items():
+            # print(image_id_list, batch_result)
+            print(image_id)
+            for i, score in enumerate(batch_result["scores"]):
+                if score > 0.5:
+                    print(batch_result["boxes"][i], score)

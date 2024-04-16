@@ -4,7 +4,7 @@ version:
 Author: ThreeStones1029 2320218115@qq.com
 Date: 2024-04-16 02:22:36
 LastEditors: ShuaiLei
-LastEditTime: 2024-04-16 08:02:31
+LastEditTime: 2024-04-16 12:46:38
 '''
 '''
 by lyuwenyu
@@ -12,7 +12,7 @@ by lyuwenyu
 import time 
 import json
 import datetime
-
+import os
 import torch 
 
 from src.misc import dist
@@ -104,7 +104,8 @@ class DetSolver(BaseSolver):
     
 
     def infer(self, infer_output_dir):
+        os.makedirs(infer_output_dir, exist_ok=True)
         self.test()
         module = self.ema.module if self.ema else self.model
-        predict(module, self.criterion, self.postprocessor,self.test_dataloader, self.device, infer_output_dir)     
+        predict(module, self.postprocessor,self.test_dataloader, self.device, infer_output_dir)     
         return

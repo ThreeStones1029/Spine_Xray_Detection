@@ -10,12 +10,16 @@ import os
 import sys
 import pathlib
 from typing import Iterable
-
+from collections import defaultdict
 import torch
 import torch.amp 
-
+# from torchvision.ops.boxes import BoundingBoxFormat
+import json
+from tqdm import tqdm
 from src.data import CocoEvaluator
 from src.misc import (MetricLogger, SmoothedValue, reduce_dict)
+from src.misc.visualizer import draw_bbox
+from PIL import Image
 
 
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
@@ -188,20 +192,24 @@ def evaluate(model: torch.nn.Module, criterion: torch.nn.Module, postprocessors,
 
 
 @torch.no_grad()
-def predict(model: torch.nn.Module, criterion: torch.nn.Module, postprocessors, data_loader, device, infer_output_dir):
+def predict(model: torch.nn.Module, postprocessors, data_loader, device, infer_output_dir, is_vis=True, visualize_threshold=0.5):
     model.eval()
-    criterion.eval()
-    # metric_logger = MetricLogger(delimiter="  ")
-    # metric_logger.add_meter('class_error', SmoothedValue(window_size=1, fmt='{value:.2f}'))
-    # header = 'Test:'
+    bboxes = []
+    with open(data_loader.dataset.ann_file, "r") as f:
+        gt = json.load(f)
+    imid2path = {}
+    catid2name = {}
+    for image in gt["images"]:
+        imid2path[image["id"]] = os.path.join(data_loader.dataset.img_folder, image["file_name"])
+    for category in gt["categories"]:
+        catid2name[category["id"]] = category["name"]
 
-    # for samples, targets in metric_logger.log_every(data_loader, 10, header):
-    for samples, targets in data_loader:
+    for samples, targets in tqdm(data_loader, desc="testing"):
+        XYXY = False
+        if str(targets[0]["boxes"].format) == "BoundingBoxFormat.XYXY":
+            XYXY = True
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
-
-        # with torch.autocast(device_type=str(device)):
-        #     outputs = model(samples)
 
         outputs = model(samples)
         orig_target_sizes = torch.stack([t["orig_size"] for t in targets], dim=0)        
@@ -209,8 +217,26 @@ def predict(model: torch.nn.Module, criterion: torch.nn.Module, postprocessors, 
         res = {target['image_id'].item(): output for target, output in zip(targets, results)}
 
         for image_id, batch_result in res.items():
-            # print(image_id_list, batch_result)
-            print(image_id)
             for i, score in enumerate(batch_result["scores"]):
-                if score > 0.5:
-                    print(batch_result["boxes"][i], score)
+                if score > visualize_threshold:
+                    bbox = batch_result["boxes"][i].tolist()
+                    if XYXY:   
+                        newbbox = [bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1]]
+                    else:
+                        newbbox = bbox
+                    bboxes.append({"image_id": image_id, 
+                                    "category_id": int(batch_result["labels"][i].cpu()), 
+                                    "bbox": newbbox, 
+                                    "score": float(score.cpu())})
+                    
+    with open(os.path.join(infer_output_dir, "bbox.json"), 'w') as f:
+        json.dump(bboxes, f)
+    print(os.path.join(infer_output_dir, "bbox.json"), "save successfully!")
+
+    # vis result
+    if is_vis:
+        for image_id in tqdm(imid2path.keys(), desc="vis bbox"):
+            # PIL默认读取为灰度图
+            image = Image.open(imid2path[image_id]).convert('RGB')
+            vis_image = draw_bbox(image, image_id, catid2name, bboxes, visualize_threshold)
+            vis_image.save(os.path.join(infer_output_dir, os.path.basename(imid2path[image_id])))

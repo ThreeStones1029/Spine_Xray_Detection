@@ -17,19 +17,15 @@ class YAMLConfig(BaseConfig):
 
         cfg = load_config(cfg_path)
         merge_dict(cfg, kwargs)
-
         # pprint(cfg)
-
         self.yaml_cfg = cfg 
-
         self.log_step = cfg.get('log_step', 100)
-        self.checkpoint_step = cfg.get('checkpoint_step', 1)
+        self.checkpoint_step = cfg.get('checkpoint_step', 1) #  will used to save path
         self.epoches = cfg.get('epoches', -1)
         self.resume = cfg.get('resume', '')
         self.tuning = cfg.get('tuning', '')
         self.sync_bn = cfg.get('sync_bn', False)
         self.output_dir = cfg.get('output_dir', None)
-        
         self.use_ema = cfg.get('use_ema', False)
         self.use_amp = cfg.get('use_amp', False)
         self.autocast = cfg.get('autocast', dict())

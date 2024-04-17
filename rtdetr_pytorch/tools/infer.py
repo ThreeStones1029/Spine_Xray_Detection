@@ -4,7 +4,7 @@ version:
 Author: ThreeStones1029 2320218115@qq.com
 Date: 2024-04-16 02:22:37
 LastEditors: ShuaiLei
-LastEditTime: 2024-04-17 08:37:24
+LastEditTime: 2024-04-17 14:18:15
 '''
 import os 
 import sys 
@@ -31,11 +31,11 @@ def prepare_coco_json(test_dataset, train_dataset):
             train_data = json.load(f)
         test_data["categories"] = train_data["categories"]
 
-        with open("rtdetr_pytorch/infer.json", "w") as f:
+        with open("/home/RT-DETR/rtdetr_pytorch/infer.json", "w") as f:
             json.dump(test_data, f)
 
 
-def main(args, ) -> None:
+def main(args) -> None:
     '''main
     '''
     dist.init_distributed()
@@ -46,20 +46,22 @@ def main(args, ) -> None:
         use_amp=args.amp,
         tuning=args.tuning
     )
+    cfg.yaml_cfg["test_dataloader"]["dataset"]["img_folder"] = args.infer_dir
     if "test_dataloader" in cfg.yaml_cfg.keys() and "train_dataloader" in cfg.yaml_cfg.keys():
         prepare_coco_json(cfg.yaml_cfg["test_dataloader"]["dataset"], cfg.yaml_cfg["train_dataloader"]["dataset"])
-
+    
     solver = TASKS[cfg.yaml_cfg['task']](cfg)
-    solver.infer(args.infer_output_dir)
+    solver.infer(args.infer_output_dir, args.draw_threshold, args.save_vis_results)
     
 
-
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', '-c', type=str, default="rtdetr_pytorch/configs/rtdetr/rtdetr_r50vd_6x_coco.yml")
-    parser.add_argument('--resume', '-r', type=str, default="rtdetr_pytorch/output/test/rtdetr_r50vd_6x_coco/best_checkpoint.pth")
+    parser.add_argument('--resume', '-r', type=str, default="rtdetr_pytorch/output/fracture_dataset/semantic/rtdetr_r50vd_6x_coco/best_checkpoint.pth")
+    parser.add_argument('--infer_dir', type=str, default="rtdetr_pytorch/datasets/test1")
     parser.add_argument('--infer_output_dir', type=str, default="rtdetr_pytorch/infer_output/test")
+    parser.add_argument('--draw_threshold', type=float, default=0.6)
+    parser.add_argument('--save_vis_results', type=bool, default=False)
     parser.add_argument('--tuning', '-t', type=str, )
     parser.add_argument('--amp', action='store_true', default=False,)
     args = parser.parse_args()

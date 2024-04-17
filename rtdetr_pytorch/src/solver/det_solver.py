@@ -4,7 +4,7 @@ version:
 Author: ThreeStones1029 2320218115@qq.com
 Date: 2024-04-16 02:22:36
 LastEditors: ShuaiLei
-LastEditTime: 2024-04-17 07:46:12
+LastEditTime: 2024-04-17 13:45:28
 '''
 '''
 by lyuwenyu
@@ -103,9 +103,9 @@ class DetSolver(BaseSolver):
         return
     
 
-    def infer(self, infer_output_dir):
+    def infer(self, infer_output_dir, draw_threshold, save_vis_results):
         os.makedirs(infer_output_dir, exist_ok=True)
         self.test()
         module = self.ema.module if self.ema else self.model
-        predict(module, self.postprocessor,self.test_dataloader, self.device, infer_output_dir)     
+        predict(module, self.postprocessor,self.test_dataloader, self.device, infer_output_dir, draw_threshold, save_vis_results)     
         return

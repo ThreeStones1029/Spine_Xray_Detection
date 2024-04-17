@@ -192,7 +192,7 @@ def evaluate(model: torch.nn.Module, criterion: torch.nn.Module, postprocessors,
 
 
 @torch.no_grad()
-def predict(model: torch.nn.Module, postprocessors, data_loader, device, infer_output_dir, is_vis=True, visualize_threshold=0.5):
+def predict(model: torch.nn.Module, postprocessors, data_loader, device, infer_output_dir, draw_threshold, save_vis_results):
     model.eval()
     bboxes = []
     with open(data_loader.dataset.ann_file, "r") as f:
@@ -218,7 +218,7 @@ def predict(model: torch.nn.Module, postprocessors, data_loader, device, infer_o
 
         for image_id, batch_result in res.items():
             for i, score in enumerate(batch_result["scores"]):
-                if score > visualize_threshold:
+                if score > draw_threshold:
                     bbox = batch_result["boxes"][i].tolist()
                     if XYXY:   
                         newbbox = [bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1]]
@@ -234,9 +234,9 @@ def predict(model: torch.nn.Module, postprocessors, data_loader, device, infer_o
     print(os.path.join(infer_output_dir, "bbox.json"), "save successfully!")
 
     # vis result
-    if is_vis:
+    if save_vis_results:
         for image_id in tqdm(imid2path.keys(), desc="vis bbox"):
             # PIL默认读取为灰度图
             image = Image.open(imid2path[image_id]).convert('RGB')
-            vis_image = draw_bbox(image, image_id, catid2name, bboxes, visualize_threshold)
+            vis_image = draw_bbox(image, image_id, catid2name, bboxes, draw_threshold)
             vis_image.save(os.path.join(infer_output_dir, os.path.basename(imid2path[image_id])))

@@ -4,16 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        // {
-        //     "name": "Python: Current File",
-        //     "type": "python",
-        //     "request": "launch",
-        //     "program": "${file}",
-        //     "console": "integratedTerminal",
-        //     "justMyCode": true,
-        //     "cwd": "${workspaceFolder}", 
-        //     "args": ["--config", "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/configs/eval/eval.yml","--classwise"]
-        // }
         {
             "name": "Python: Current File",
             "type": "python",
@@ -22,6 +12,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}", 
+            "args": ["--config", "rtdetr_pytorch/configs/rtdetr/rtdetr_r50vd_6x_coco.yml"]
         }
     ]
 }

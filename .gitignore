@@ -8,3 +8,4 @@ rtdetr_paddle/vdl_dir
 rtdetr_paddle/train_and_predict.md
 rtdetr_pytorch/output
 rtdetr_pytorch/infer_output 
+rtdetr_pytorch/datasets

@@ -7,8 +7,8 @@ train_dataloader:
   type: DataLoader
   dataset: 
     type: CocoDetection
-    img_folder: ../rtdetr_paddle/datasets/fracture_dataset/train/
-    ann_file: ../rtdetr_paddle/datasets/fracture_dataset/annotations/semantic_bbox_train.json
+    img_folder: rtdetr_paddle/datasets/fracture_dataset/train/
+    ann_file: rtdetr_paddle/datasets/fracture_dataset/annotations/semantic_bbox_train.json
     transforms:
       type: Compose
       ops: ~
@@ -22,8 +22,8 @@ val_dataloader:
   type: DataLoader
   dataset: 
     type: CocoDetection
-    img_folder: ../rtdetr_paddle/datasets/fracture_dataset/val/
-    ann_file: ../rtdetr_paddle/datasets/fracture_dataset/annotations/semantic_bbox_val.json
+    img_folder: rtdetr_paddle/datasets/fracture_dataset/val/
+    ann_file: rtdetr_paddle/datasets/fracture_dataset/annotations/semantic_bbox_val.json
     transforms:
       type: Compose
       ops: ~ 
@@ -38,8 +38,8 @@ test_dataloader:
   type: DataLoader
   dataset: 
     type: CocoDetection
-    img_folder: ../rtdetr_paddle/datasets/fracture_dataset/test/
-    ann_file: ../rtdetr_paddle/datasets/fracture_dataset/annotations/semantic_bbox_test.json
+    img_folder: rtdetr_pytorch/datasets/test
+    ann_file: rtdetr_pytorch/infer.json
     transforms:
       type: Compose
       ops: ~ 

@@ -163,33 +163,26 @@ def no_random_split_coco_dataset():
     print("数据集划分完成！")
 
 
-def assign_images_split(assign_dataset_name):
+def assign_images_split(input_root, output_root):
     """
     手动划分数据集后,根据图片名称划分json文件
     """
     # 数据集路径
-    dataset_root = "./datasets/instance"
-    images_folder = os.path.join(dataset_root, "images")
-    annotations_path = os.path.join(dataset_root,"annotations" ,"Final_instance_Label.json")
-    # 修改json里面的图片路径
-    modify_json(annotations_path, assign_dataset_name)
+    annotations_path = os.path.join(input_root,"annotations" ,"semantic.json")
+
     # 输出路径
-    output_root = os.path.join(dataset_root, assign_dataset_name)
     os.makedirs(output_root, exist_ok=True)
     # 读取annotations.json文件
     with open(annotations_path, "r") as f:
         annotations_data = json.load(f)
     # 提取images, annotations, categories
-    # 修改数据集创建时间
-    info = annotations_data["info"]
-    info['date'] = datetime.today().strftime('%Y-%m-%d')
     images = annotations_data["images"]
     annotations = annotations_data["annotations"]
     categories = annotations_data["categories"]
     # 选定图片作为训练集、验证集（从指定json文件里面选）
-    assign_train_images_path = "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/datasets/instance/assign_images/train"
-    assign_val_images_path = "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/datasets/instance/assign_images/val"
-    assign_test_images_path = "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/datasets/instance/assign_images/test"
+    assign_train_images_path = os.path.join(input_root, "train")
+    assign_val_images_path = os.path.join(input_root, "val")
+    assign_test_images_path = os.path.join(input_root, "test")
     def get_images(assign_images_path, images):
         assign_images = []
         for root, dirs, files in os.walk(assign_images_path):
@@ -200,20 +193,7 @@ def assign_images_split(assign_dataset_name):
     train_images = get_images(assign_train_images_path, images)
     val_images = get_images(assign_val_images_path, images)
     test_images = get_images(assign_test_images_path, images)
-    # 分别为训练集、验证集和测试集创建子文件夹
-    train_folder = os.path.join(output_root, "train")
-    val_folder = os.path.join(output_root, "val")
-    test_folder = os.path.join(output_root, "test")
-    os.makedirs(train_folder, exist_ok=True)
-    os.makedirs(val_folder, exist_ok=True)
-    os.makedirs(test_folder, exist_ok=True)
-    # 将图片文件复制到相应的子文件夹
-    for img in train_images:
-        shutil.copy(os.path.join(images_folder, img["file_name"]), os.path.join(train_folder, img["file_name"]))
-    for img in val_images:
-        shutil.copy(os.path.join(images_folder, img["file_name"]), os.path.join(val_folder, img["file_name"]))
-    for img in test_images:
-        shutil.copy(os.path.join(images_folder, img["file_name"]), os.path.join(test_folder, img["file_name"]))
+
     # 根据图片id分配annotations
     def filter_annotations(annotations, image_ids):
         return [ann for ann in annotations if ann["image_id"] in image_ids]
@@ -221,21 +201,15 @@ def assign_images_split(assign_dataset_name):
     val_ann = filter_annotations(annotations, [img["id"] for img in val_images])
     test_ann = filter_annotations(annotations, [img["id"] for img in test_images])
     # 生成train.json, val.json, test.json
-    train_json = {"info": info, "images": train_images, "annotations": train_ann, "categories": categories}
-    val_json = {"info": info, "images": val_images, "annotations": val_ann, "categories": categories}
-    test_json = {"info": info, "images": test_images, "annotations": test_ann, "categories": categories}
+    train_json = {"info": annotations_data["info"], "images": train_images, "annotations": train_ann, "categories": categories}
+    val_json = {"info": annotations_data["info"], "images": val_images, "annotations": val_ann, "categories": categories}
+    test_json = {"info": annotations_data["info"], "images": test_images, "annotations": test_ann, "categories": categories}
     with open(os.path.join(output_root,"bbox_train.json"), "w") as f:
         json.dump(train_json, f)
-    # 修改images图片路径
-    modify_json(os.path.join(output_root,"bbox_train.json"), assign_dataset_name)
     with open(os.path.join(output_root, "bbox_val.json"), "w") as f:
         json.dump(val_json, f)
-    # 修改images图片路径
-    modify_json(os.path.join(output_root,"bbox_val.json"), assign_dataset_name)
     with open(os.path.join(output_root, "bbox_test.json"), "w") as f:
         json.dump(test_json, f)
-    # 修改images图片路径
-    modify_json(os.path.join(output_root,"bbox_test.json"), assign_dataset_name)
     print("数据集划分完成！")
 
 
@@ -272,14 +246,12 @@ def split_train_dataset_to_no_label_and_label(train_folder, train_no_label_folde
 
 if __name__ == "__main__":
     # no_random_split_coco_dataset()
-    # 检测划分是否完好
-    # split_dataset_path = "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/datasets/All_datasets/Final_instance_Label/assign_images"
-    # origin_dataset_path = "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/datasets/All_datasets/Final_instance_Label/images"
-    # check_split_complete(split_dataset_path, origin_dataset_path)
     # split_train_dataset_to_no_label_and_label("datasets/miccai/xray/images/train_instance",
     #                                           "datasets/miccai/xray/images/train_instance_60",
     #                                           "datasets/miccai/xray/images/train_instance_20")
-    random_split_coco_dataset("datasets/fracture_dataset/images",
-                              "datasets/fracture_dataset/annotations/semantic.json",
-                              "datasets/fracture_dataset/split_dataset",
-                              {"train": 0.6, "val": 0.2, "test": 0.2})
+    # random_split_coco_dataset("datasets/fracture_dataset/images",
+    #                           "datasets/fracture_dataset/annotations/semantic.json",
+    #                           "datasets/fracture_dataset/split_dataset",
+    #                           {"train": 0.6, "val": 0.2, "test": 0.2})
+
+    assign_images_split("datasets/fracture_dataset", "datasets/fracture_dataset")

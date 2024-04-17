@@ -3,10 +3,10 @@
 
 import torch 
 import torch.nn as nn
-
+import os
 import re 
 import copy
-
+import json
 from .config import BaseConfig
 from .yaml_utils import load_config, merge_config, create, merge_dict
 
@@ -17,7 +17,6 @@ class YAMLConfig(BaseConfig):
 
         cfg = load_config(cfg_path)
         merge_dict(cfg, kwargs)
-        # pprint(cfg)
         self.yaml_cfg = cfg 
         self.log_step = cfg.get('log_step', 100)
         self.checkpoint_step = cfg.get('checkpoint_step', 1) #  will used to save path

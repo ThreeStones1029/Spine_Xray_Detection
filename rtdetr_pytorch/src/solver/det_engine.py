@@ -192,7 +192,7 @@ def evaluate(model: torch.nn.Module, criterion: torch.nn.Module, postprocessors,
 
 
 @torch.no_grad()
-def predict(model: torch.nn.Module, postprocessors, data_loader, device, infer_output_dir, draw_threshold, save_vis_results):
+def predict(model: torch.nn.Module, postprocessors, data_loader, device, output_dir, draw_threshold, visualize, save_results):
     model.eval()
     bboxes = []
     with open(data_loader.dataset.ann_file, "r") as f:
@@ -203,7 +203,7 @@ def predict(model: torch.nn.Module, postprocessors, data_loader, device, infer_o
         imid2path[image["id"]] = os.path.join(data_loader.dataset.img_folder, image["file_name"])
     for category in gt["categories"]:
         catid2name[category["id"]] = category["name"]
-
+    bbox_id = -1
     for samples, targets in tqdm(data_loader, desc="testing"):
         XYXY = False
         if str(targets[0]["boxes"].format) == "BoundingBoxFormat.XYXY":
@@ -224,19 +224,29 @@ def predict(model: torch.nn.Module, postprocessors, data_loader, device, infer_o
                         newbbox = [bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1]]
                     else:
                         newbbox = bbox
-                    bboxes.append({"image_id": image_id, 
+                    bbox_id += 1
+                    bboxes.append({"id": bbox_id,
+                                   "image_id": image_id, 
                                     "category_id": int(batch_result["labels"][i].cpu()), 
+                                    "category_name": catid2name[int(batch_result["labels"][i].cpu())],
+                                    "file_name": os.path.basename(imid2path[image_id]),
                                     "bbox": newbbox, 
                                     "score": float(score.cpu())})
-                    
-    with open(os.path.join(infer_output_dir, "bbox.json"), 'w') as f:
-        json.dump(bboxes, f)
-    print(os.path.join(infer_output_dir, "bbox.json"), "save successfully!")
+    if save_results=="True":          
+        with open(os.path.join(output_dir, "bbox.json"), 'w') as f:
+            json.dump(bboxes, f)
+        print(os.path.join(output_dir, "bbox.json"), "save successfully!")
+
+    # use iter get batch images and labels information.
+    # data_iter = iter(data_loader)
+    # images, labels = next(data_iter)
+    # print(images.shape)
+    # print(labels)
 
     # vis result
-    if save_vis_results:
+    if visualize=="True":
         for image_id in tqdm(imid2path.keys(), desc="vis bbox"):
             # PIL默认读取为灰度图
             image = Image.open(imid2path[image_id]).convert('RGB')
             vis_image = draw_bbox(image, image_id, catid2name, bboxes, draw_threshold)
-            vis_image.save(os.path.join(infer_output_dir, os.path.basename(imid2path[image_id])))
+            vis_image.save(os.path.join(output_dir, os.path.basename(imid2path[image_id])))

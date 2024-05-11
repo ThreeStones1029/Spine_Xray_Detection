@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 import PIL
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import cv2
 import math
 import json
@@ -89,6 +89,10 @@ def draw_bbox(image, im_id, catid2name, bboxes, threshold):
     Draw bbox on image
     """
     draw = ImageDraw.Draw(image)
+    try:
+        font = ImageFont.truetype('arial.ttf', 40)
+    except IOError:
+        font = ImageFont.load_default(size=40)
 
     catid2color = {}
     color_list = colormap(rgb=True)[:40]
@@ -132,7 +136,7 @@ def draw_bbox(image, im_id, catid2name, bboxes, threshold):
         # draw label
         text = "{} {:.4f}".format(catid2name[catid], score)
         # tw, th = draw.textsize(text)
-        left, top, right, bottom = draw.textbbox((0, 0), text)
+        left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
         tw, th = right - left, bottom - top
 
         #label框
@@ -141,7 +145,7 @@ def draw_bbox(image, im_id, catid2name, bboxes, threshold):
         
         # label文字 
         # (xmin + 1, ymin - th)
-        draw.text((xmin + 1, ymin + 1), text, fill='red') 
+        draw.text((xmin + 1, ymin + 1), text, fill='red', font=font) 
         # draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255))
     
     return image

@@ -5,6 +5,7 @@ import shutil
 from datetime import datetime
 from json_process import load_json_file, save_json_file
     
+    
 def random_split_coco_dataset(images_folder_path, annotation_file, output_folder_path, split_info_dict):
     """
     随机划分json文件,并划分好相应的数据集

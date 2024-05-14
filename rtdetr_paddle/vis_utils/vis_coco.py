@@ -7,6 +7,7 @@ from tqdm import tqdm
 from multiprocessing import Process
 from utils.io.common import create_folder, join
 
+
 class VisCoCo(COCO):
     def __init__(self, annotation_file, images_folder, bbox_vis_folder=None, rotate_bbox_vis_folder=None):
         super(VisCoCo, self).__init__(annotation_file)
@@ -29,7 +30,7 @@ class VisCoCo(COCO):
             try:
                 self.font = ImageFont.truetype('arial.ttf', self.fontsize)
             except IOError:
-                self.font = ImageFont.load_default()
+                self.font = ImageFont.load_default(size=self.fontsize)
 
 
     def visualize_bboxes_in_images(self):
@@ -37,14 +38,17 @@ class VisCoCo(COCO):
         多张图片可视化水平框
         """
         files_path = self.get_files_path()
-        vis = []
+        # vis = []
+        # for i in tqdm(range(len(sorted(files_path))), total=len(files_path), desc="vis bbox"):
+        #     if  os.path.basename(files_path[i]) in self.file_name2img_id.keys():
+        #         vis.append(Process(target=self.visualize_bboxes_in_image, args=(files_path[i],)))
+        #         vis[i].start()
+        # for i in range(len(sorted(files_path))):
+        #     if  os.path.basename(files_path[i]) in self.file_name2img_id.keys():
+        #         vis[i].join()
         for i in tqdm(range(len(sorted(files_path))), total=len(files_path), desc="vis bbox"):
-            if  os.path.basename(files_path[i]) in self.file_name2img_id.keys():
-                vis.append(Process(target=self.visualize_bboxes_in_image, args=(files_path[i],)))
-                vis[i].start()
-        for i in range(len(sorted(files_path))):
-            if  os.path.basename(files_path[i]) in self.file_name2img_id.keys():
-                vis[i].join()
+            # if  os.path.basename(files_path[i]) in self.file_name2img_id.keys():
+            self.visualize_bboxes_in_image(files_path[i])
         
 
     def visualize_bboxes_in_image(self, file_path):

@@ -4,7 +4,7 @@ version:
 Author: ThreeStones1029 2320218115@qq.com
 Date: 2024-05-14 05:16:28
 LastEditors: ShuaiLei
-LastEditTime: 2024-05-14 14:06:54
+LastEditTime: 2024-05-19 01:07:47
 '''
 import sys
 import os
@@ -77,10 +77,10 @@ def split_train_dataset_to_4_folds(images_folder_path,
 def merge_train_dataset(dataset_root_folder, fold_list, train_images_folder, annotations_folder):
     """
     The function will be used to merge train dataset.
-    param: dataset_root_folder: 
+    param: dataset_root_folder: the dataset root folder.
     param: fold_list: the choosed fold will be used to merge train dataset.
-    param: train_images_folder: 
-    param: annotations_folder: 
+    param: train_images_folder: the imsges folder.
+    param: annotations_folder: the 
     """
     instance_fold0_dataset = load_json_file(os.path.join(dataset_root_folder, "instance_bbox_" + fold_list[0] + ".json"))
     semantic_fold0_dataset = load_json_file(os.path.join(dataset_root_folder, "semantic_bbox_" + fold_list[0] + ".json"))
@@ -189,14 +189,14 @@ if __name__ == "__main__":
     #                      "fold3"],
     #                      train_images_folder="/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/images4/train",
     #                      annotations_folder="/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/annotations4")
-    vis = VisCoCo(annotation_file="/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/annotations1/train_instance_20.json", 
-                  images_folder="/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/images1/train_20", 
-                  bbox_vis_folder="/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/images1/gt")
+    vis = VisCoCo(annotation_file="/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/annotations4/train_instance_20.json", 
+                  images_folder="/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/images4/train_20", 
+                  bbox_vis_folder="/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/images4/gt")
 
     vis.visualize_bboxes_in_images()
 
-    # split_train_dataset_to_20_percentage_and_60_percentage("/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/images1/train", 
-    #                                                         "/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/annotations1/train_instance.json",
-    #                                                         "/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/annotations1/train_semantic.json",       
-    #                                                         "/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/images1",
-    #                                                         split_info_dict={"train_20": 29, "train_60":86})
+    # split_train_dataset_to_20_percentage_and_60_percentage("/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/images4/train", 
+    #                                                         "/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/annotations4/train_instance.json",
+    #                                                         "/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/annotations4/train_semantic.json",       
+    #                                                         "/home/RT-DETR/rtdetr_paddle/datasets/miccai/xray/images4",
+    #                                                         split_info_dict={"train_20": 29, "train_60":85})

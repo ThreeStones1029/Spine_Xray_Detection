@@ -1,21 +1,58 @@
-metric: COCO
-num_classes: 9
+# metric: COCO
+# num_classes: 9
+# TrainDataset:
+#   name: COCODataSet
+#   image_dir: images4/train_20
+#   anno_path: annotations4/train_instance_20.json
+#   dataset_dir: datasets/miccai/xray
+#   data_fields: ['image', 'gt_bbox', 'gt_class', 'is_crowd']
+# EvalDataset:
+#   name: COCODataSet
+#   image_dir: images4/train_60
+#   anno_path: annotations4/train_instance_60.json
+#   dataset_dir: datasets/miccai/xray
+#   allow_empty: true
+# TestDataset:
+#   name: ImageFolder
+#   anno_path: annotations4/train_instance_60.json # also support txt (like VOC's label_list.txt)
+#   dataset_dir: datasets/miccai/xray # if set, anno_path will be 'dataset_dir/anno_path'
 
+
+# metric: COCO
+# num_classes: 9
+# TrainDataset:
+#   name: COCODataSet
+#   image_dir: images4/train
+#   anno_path: rtdetr50_annotations_retrain4/retrain_instance.json
+#   dataset_dir: datasets/miccai/xray
+#   data_fields: ['image', 'gt_bbox', 'gt_class', 'is_crowd']
+# EvalDataset:
+#   name: COCODataSet
+#   image_dir: images4/val
+#   anno_path: rtdetr50_annotations_retrain4/val_instance.json
+#   dataset_dir: datasets/miccai/xray
+#   allow_empty: true
+# TestDataset:
+#   name: ImageFolder
+#   anno_path: rtdetr50_annotations_retrain4/val_instance.json # also support txt (like VOC's label_list.txt)
+#   dataset_dir: datasets/miccai/xray # if set, anno_path will be 'dataset_dir/anno_path'
+
+
+metric: COCO
+num_classes: 4
 TrainDataset:
   name: COCODataSet
-  image_dir: images4/train_20
-  anno_path: annotations4/train_instance_20.json
-  dataset_dir: /home/RT-DETR/rtdetr_paddle/datasets/miccai/xray
+  image_dir: images4/train
+  anno_path: rtdetr50_annotations_retrain4/retrain_semantic.json
+  dataset_dir: datasets/miccai/xray
   data_fields: ['image', 'gt_bbox', 'gt_class', 'is_crowd']
-
 EvalDataset:
   name: COCODataSet
   image_dir: images4/val
-  anno_path: annotations4/val_instance.json
-  dataset_dir: /home/RT-DETR/rtdetr_paddle/datasets/miccai/xray
+  anno_path: rtdetr50_annotations_retrain4/val_semantic.json
+  dataset_dir: datasets/miccai/xray
   allow_empty: true
-
 TestDataset:
   name: ImageFolder
-  anno_path: annotations4/val_instance.json # also support txt (like VOC's label_list.txt)
-  dataset_dir: /home/RT-DETR/rtdetr_paddle/datasets/miccai/xray # if set, anno_path will be 'dataset_dir/anno_path'
+  anno_path: rtdetr50_annotations_retrain4/val_semantic.json # also support txt (like VOC's label_list.txt)
+  dataset_dir: datasets/miccai/xray # if set, anno_path will be 'dataset_dir/anno_path'

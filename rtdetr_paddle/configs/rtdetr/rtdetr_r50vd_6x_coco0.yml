@@ -1,0 +1,11 @@
+_BASE_: [
+  '../datasets/coco_detection0.yml',
+  '../runtime0.yml',
+  '_base_/optimizer_6x.yml',
+  '_base_/rtdetr_r50vd.yml',
+  '_base_/rtdetr_reader.yml',
+]
+
+weights: output/xray/fold0/semantic_20_drr_buu_pretrain/rtdetr_r50vd_6x_coco/best_model
+find_unused_parameters: True # 多卡设置False
+log_iter: 200

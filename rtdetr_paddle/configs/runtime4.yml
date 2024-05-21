@@ -3,7 +3,7 @@ use_xpu: false
 use_mlu: false
 use_npu: false
 log_iter: 20
-save_dir:  output/xray/fold4/instance_20_drr_buu_pretrain
+save_dir:  output/xray/fold4/semantic_drr_buu_pretrain_retrain
 snapshot_epoch: 20
 print_flops: false
 print_params: false

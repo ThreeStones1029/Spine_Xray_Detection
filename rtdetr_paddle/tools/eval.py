@@ -195,12 +195,11 @@ def main(FLAGS):
 
 # 整体评估完后，修改json文件名
 def modify_json_name(json_path):
-    
     os.rename(os.path.join(json_path, 'bbox.json'), os.path.join(json_path, 'result.json'))
 
 
 if __name__ == '__main__':
     FLAGS = parse_args()
-    FLAGS.output_eval = 'eval/fracture_dataset'
+    FLAGS.output_eval = 'eval/miccai/xray/fold1/semantic_20_drr_buu_pretrain'
     main(FLAGS)
     modify_json_name(FLAGS.output_eval)

@@ -220,39 +220,18 @@ def main(FLAGS):
     check_xpu(cfg.use_xpu)
     check_mlu(cfg.use_mlu)
     check_version()
-
     run(FLAGS, cfg)
-
-
-def show_infer_result(img_path):
-    import matplotlib.pyplot as plt
-    import matplotlib.image as mpimg
-
-    # 读取图片
-    img = mpimg.imread(img_path)
-
-    # 显示图片
-    plt.imshow(img)
-    plt.show()
-
-
-def test_images(FLAGS):
-
-    main(FLAGS)
-    if FLAGS.infer_img:
-        show_infer_result(os.path.join(FLAGS.output_dir, os.path.basename(FLAGS.infer_img)))
 
 
 if __name__ == '__main__':
 
     FLAGS = parse_args()
+    FLAGS.infer_dir = "datasets/miccai/xray/images1/train_60"
+    # FLAGS.infer_img = "datasets/BUU/sample/train/0001-F-037Y0.jpg"
+    FLAGS.output_dir = "infer_output/miccai/xray/fold1/semantic_20_drr_buu_pretrain/rtdetr50"
+    FLAGS.draw_threshold = 0.6
+    FLAGS.weights = "output/xray/fold1/semantic_20_drr_buu_pretrain/rtdetr_r50vd_6x_coco1/best_model.pdparams"
+    FLAGS.use_vdl = False
+    FLAGS.save_results = True
     main(FLAGS)
-    # FLAGS.infer_dir = "/home/jjf/Desktop/drr_utils/data/segmentation_dataset2/LA/images"
-    # # FLAGS.infer_img = "datasets/BUU/sample/train/0001-F-037Y0.jpg"
-    # FLAGS.output_dir = "/home/jjf/Desktop/drr_utils/data/segmentation_dataset2/LA/detection_result"
-    # FLAGS.draw_threshold = 0.6
-    # FLAGS.weights = "output/New_ITK_Pre/rtdetr_r50vd_6x_coco/best_model.pdparams"
-    # FLAGS.use_vdl = False
-    # FLAGS.save_results = True
-    # test_images(FLAGS)
     

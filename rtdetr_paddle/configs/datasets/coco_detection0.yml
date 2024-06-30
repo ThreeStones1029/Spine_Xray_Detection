@@ -1,21 +1,42 @@
-metric: COCO
-num_classes: 4
+# metric: COCO
+# num_classes: 4
 
+# TrainDataset:
+#   name: COCODataSet
+#   image_dir: images1/train_20
+#   anno_path: annotations1/train_semantic_20.json
+#   dataset_dir: datasets/miccai/xray
+#   data_fields: ['image', 'gt_bbox', 'gt_class', 'is_crowd']
+
+# EvalDataset:
+#   name: COCODataSet
+#   image_dir: images1/train_60
+#   anno_path: annotations1/train_semantic_60.json
+#   dataset_dir: datasets/miccai/xray
+#   allow_empty: true
+
+# TestDataset:
+#   name: ImageFolder
+#   anno_path: annotations1/train_semantic_60.json # also support txt (like VOC's label_list.txt)
+#   dataset_dir: datasets/miccai/xray # if set, anno_path will be 'dataset_dir/anno_path'
+
+
+# BUU预训练
+metric: COCO
+num_classes: 17
 TrainDataset:
   name: COCODataSet
-  image_dir: images1/train_20
-  anno_path: annotations1/train_semantic_20.json
-  dataset_dir: datasets/miccai/xray
+  image_dir: images/train
+  anno_path: annotations/buu_5800_train.json
+  dataset_dir: datasets/miccai/buu
   data_fields: ['image', 'gt_bbox', 'gt_class', 'is_crowd']
-
 EvalDataset:
   name: COCODataSet
-  image_dir: images1/train_60
-  anno_path: annotations1/train_semantic_60.json
-  dataset_dir: datasets/miccai/xray
+  image_dir: images/val
+  anno_path: annotations/buu_5800_val.json
+  dataset_dir: datasets/miccai/buu
   allow_empty: true
-
 TestDataset:
   name: ImageFolder
-  anno_path: annotations1/train_semantic_60.json # also support txt (like VOC's label_list.txt)
-  dataset_dir: datasets/miccai/xray # if set, anno_path will be 'dataset_dir/anno_path'
+  anno_path: annotations/buu_5800_val.json # also support txt (like VOC's label_list.txt)
+  dataset_dir: datasets/miccai/buu # if set, anno_path will be 'dataset_dir/anno_path'

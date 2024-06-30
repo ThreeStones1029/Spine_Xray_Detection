@@ -1,6 +1,8 @@
 from pycocotools.coco import COCO
 from glob import glob
 import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.getcwd()), "rtdetr_paddle"))
 import multiprocessing
 from PIL import Image, ImageOps, ImageDraw, ImageFont
 from tqdm import tqdm
@@ -235,8 +237,8 @@ if __name__ == "__main__":
     # vis = VisCoCo("datasets/miccai/buu/annotations/buu_5800_val.json", "datasets/miccai/buu/val", "datasets/miccai/buu/vis")
     # vis.visualize_bboxes_in_image(os.path.join("datasets/miccai/buu/val", "0126-F-026Y1.jpg"))
 
-    vis = VisCoCo("datasets/miccai/xray/annotations/val_instance.json", 
-                    "datasets/miccai/xray/images/val_semantic", 
-                    "datasets/miccai/xray/images/val_gt")
+    vis = VisCoCo("datasets/LA_preoperative_xray_fracture.json", 
+                    "datasets/LA_preoperative_xray_fracture", 
+                    "datasets/LA_preoperative_xray_fracture_gt")
     vis.visualize_bboxes_in_images()
 

@@ -4,7 +4,7 @@ version: 1.0
 Author: ShuaiLei
 Date: 2023-10-24 14:21:48
 LastEditors: ShuaiLei
-LastEditTime: 2023-11-14 17:16:49
+LastEditTime: 2024-06-30 06:38:13
 
 
 BUU datasets annotations format:
@@ -34,6 +34,7 @@ class Min_json2coco:
         self.save_path = save_path
         self.choose_ids = choose_ids
         self.is_del_hard = is_del_hard
+        self.ann_id = 1
         if annotation_file != None:
             print('loading annotations into memory...')
             with open(self.annotations_file, "r") as f:
@@ -65,21 +66,27 @@ class Min_json2coco:
     def add_categories(self):
         categories = []
         cats = {}
+        # categories.append({"id": 1,
+        #                    "name": "Pelvis", 
+        #                    "supercategory": "vertebrae"})
+        # for i in range(2, 7):
+        #     categories.append({"id": i,
+        #                        "name": "L" + str(7-i),
+        #                        "supercategory": "vertebrae"}) 
+        # for i in range(7, 19):
+        #     categories.append({"id": i,
+        #                        "name": "T" + str(19-i),
+        #                        "supercategory": "vertebrae"}) 
+        # for i in range(19, 26):
+        #     categories.append({"id": i,
+        #                        "name": "C" + str(26-i),
+        #                        "supercategory": "vertebrae"})  
         categories.append({"id": 1,
-                           "name": "Pelvis", 
+                           "name": "normal", 
                            "supercategory": "vertebrae"})
-        for i in range(2, 7):
-            categories.append({"id": i,
-                               "name": "L" + str(7-i),
-                               "supercategory": "vertebrae"}) 
-        for i in range(7, 19):
-            categories.append({"id": i,
-                               "name": "T" + str(19-i),
-                               "supercategory": "vertebrae"}) 
-        for i in range(19, 26):
-            categories.append({"id": i,
-                               "name": "C" + str(26-i),
-                               "supercategory": "vertebrae"})  
+        categories.append({"id": 2,
+                           "name": "fracture", 
+                           "supercategory": "vertebrae"})
         self.dataset['categories'] = categories
 
         for cat in self.dataset['categories']:
@@ -92,7 +99,18 @@ class Min_json2coco:
         imgs = {}
         for img_info in self.label_studio_annotations:
             if  (self.choose_ids=="all" or img_info['id'] in self.choose_ids) and img_info['annotator'] != 3: # 排除原始BUU数据自带的标注,同时挑选需要的图片
-                if self.is_del_hard and ("sentiment" not in img_info.keys() or ("sentiment" in img_info.keys() and img_info["sentiment"] == "False")): # 排除标注困难的
+                # 是否需要删除标注困难的
+                if self.is_del_hard:
+                    if "sentiment" not in img_info.keys() or ("sentiment" in img_info.keys() and img_info["sentiment"] == "False"): # 排除标注困难的
+                        img = {}
+                        img['id'] = img_info['id']
+                        img['type'] = img_info['type']
+                        img['L4L6'] = img_info['L4L6']
+                        img['file_name'] = os.path.basename(img_info['img'])
+                        img['width'] = img_info["bbox"][0]['original_width']
+                        img['height'] = img_info["bbox"][0]['original_height']
+                        images.append(img)
+                else:
                     img = {}
                     img['id'] = img_info['id']
                     img['type'] = img_info['type']
@@ -108,68 +126,17 @@ class Min_json2coco:
 
 
     def add_annotations(self):
-        annotations = []
+        self.dataset['annotations'] = []
         anns = {}
-        ann_id = 1
         # 对于所有图片
         for img_info in self.label_studio_annotations:
             if  (self.choose_ids=="all" or img_info['id'] in self.choose_ids) and img_info['annotator'] != 3: # 排除原始BUU数据自带的标注,同时挑选需要的图片
-                if self.is_del_hard and ("sentiment" not in img_info.keys() or ("sentiment" in img_info.keys() and img_info["sentiment"] == "False")): # 排除标注困难的
-                    cat_name2keypoints = defaultdict(list)
-                    cat_name2bboxes = defaultdict(list)
-                    # 将同一个类别的点加入到同一个列表
-                    if 'vertebrae-point' in img_info.keys():
-                        for point in img_info['vertebrae-point']:
-                            if point['keypointlabels'][0] != "Pelvis": # 侧位骨盆有标注框，就不需要点了
-                                cat_name2keypoints[point['keypointlabels'][0]].append(point)
-                    # 将框加入字典列表
-                    if 'bbox' in img_info.keys():
-                        for bbox in img_info['bbox']:
-                            cat_name2bboxes[bbox['rectanglelabels'][0]].append(bbox)
-                    cat_name2id = {category['name']: category['id'] for category in self.dataset['categories']}
-
-                    # 将单张图片 先加入标志点围成的框
-                    for cat_name, points in cat_name2keypoints.items():
-                        ann = {}
-                        ann['id'] = ann_id
-                        ann['image_id'] = img_info['id']
-                        ann['iscrowd'] = 0
-                        ann['category_id'] = cat_name2id[cat_name]
-                        ann['category_name'] = cat_name
-                        x = []
-                        y = []
-                        for point in points:
-                            x.append(point['x'] * point['original_width'] / 100)
-                            y.append(point['y'] * point['original_height'] / 100)
-                        min_x = min(x)
-                        min_y = min(y)
-                        max_x = max(x)
-                        max_y = max(y)
-                        bbox_width = max_x - min_x
-                        bbox_height = max_y - min_y
-                        bbox = [min_x, min_y, bbox_width, bbox_height]
-                        ann['bbox'] = bbox
-                        ann['area'] = bbox_height * bbox_width
-                        ann_id += 1
-                        annotations.append(ann)
-
-                    # 加入标注的框信息
-                    for cat_name, bbox in cat_name2bboxes.items():
-                        ann = {}
-                        ann['id'] = ann_id
-                        ann['image_id'] = img_info['id']
-                        ann['iscrowd'] = 0
-                        ann['category_id'] = cat_name2id[cat_name]
-                        ann['category_name'] = cat_name
-                        ann['bbox'] = [bbox[0]['x'] * bbox[0]['original_width'] / 100, 
-                                    bbox[0]['y'] * bbox[0]['original_height'] /100, 
-                                    bbox[0]['width'] * bbox[0]['original_width'] / 100, 
-                                    bbox[0]['height'] * bbox[0]['original_height'] / 100]
-                        ann['area'] = ann['bbox'][2] * ann['bbox'][3]
-                        ann_id += 1
-                        annotations.append(ann)
-        self.dataset['annotations'] = annotations
-
+                if self.is_del_hard:
+                    if "sentiment" not in img_info.keys() or ("sentiment" in img_info.keys() and img_info["sentiment"] == "False"): # 排除标注困难的
+                        self.single_add_annotations(img_info)
+                else:
+                    self.single_add_annotations(img_info)
+        
         imgToAnns, catToImgs = defaultdict(list), defaultdict(list)
         for ann in self.dataset['annotations']:
             imgToAnns[ann['image_id']].append(ann)
@@ -177,6 +144,58 @@ class Min_json2coco:
             anns[ann['id']] = ann
         self.imgToAnns = imgToAnns
         self.anns = anns
+
+
+    def single_add_annotations(self, img_info):
+        cat_name2keypoints = defaultdict(list)
+        # 将同一个类别的点加入到同一个列表
+        if 'vertebrae-point' in img_info.keys():
+            for point in img_info['vertebrae-point']:
+                if point['keypointlabels'][0] != "Pelvis": # 侧位骨盆有标注框，就不需要点了
+                    cat_name2keypoints[point['keypointlabels'][0]].append(point)
+        cat_name2id = {category['name']: category['id'] for category in self.dataset['categories']}
+
+        # 将单张图片 先加入标志点围成的框
+        for cat_name, points in cat_name2keypoints.items():
+            ann = {}
+            ann['id'] = self.ann_id
+            ann['image_id'] = img_info['id']
+            ann['iscrowd'] = 0
+            ann['category_id'] = cat_name2id[cat_name]
+            ann['category_name'] = cat_name
+            x = []
+            y = []
+            for point in points:
+                x.append(point['x'] * point['original_width'] / 100)
+                y.append(point['y'] * point['original_height'] / 100)
+            min_x = min(x)
+            min_y = min(y)
+            max_x = max(x)
+            max_y = max(y)
+            bbox_width = max_x - min_x
+            bbox_height = max_y - min_y
+            bbox = [min_x, min_y, bbox_width, bbox_height]
+            ann['bbox'] = bbox
+            ann['area'] = bbox_height * bbox_width
+            self.ann_id += 1
+            self.dataset['annotations'].append(ann)
+
+        # 加入标注的框信息
+        for bbox in img_info['bbox']:
+            ann = {}
+            ann['id'] = self.ann_id
+            ann['image_id'] = img_info['id']
+            ann['iscrowd'] = 0
+            cat_name = bbox["rectanglelabels"][0]
+            ann['category_id'] = cat_name2id[cat_name]
+            ann['category_name'] = cat_name
+            ann['bbox'] = [bbox['x'] * bbox['original_width'] / 100, 
+                        bbox['y'] * bbox['original_height'] /100, 
+                        bbox['width'] * bbox['original_width'] / 100, 
+                        bbox['height'] * bbox['original_height'] / 100]
+            ann['area'] = ann['bbox'][2] * ann['bbox'][3]
+            self.ann_id += 1
+            self.dataset['annotations'].append(ann)
 
 
     def save_dataset(self):
@@ -190,9 +209,9 @@ if __name__ == "__main__":
 
     # print(len(choose_ids))
 
-    conversion = Min_json2coco(annotation_file="datasets/miccai/BUU/annotations/project-1-at-2024-02-17-13-31-3e1ed79f.json", 
+    conversion = Min_json2coco(annotation_file="datasets/project-21-at-2024-06-30-04-20-534e620c.json", 
                                choose_ids='all',
-                               is_del_hard=True,
-                               save_path="datasets/miccai/BUU/annotations/buu_5800.json")
+                               is_del_hard=False,
+                               save_path="datasets/LA_preoperative_xray_fracture.json")
 
     print(len(conversion.imgs))

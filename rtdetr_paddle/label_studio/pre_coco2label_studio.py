@@ -4,7 +4,7 @@ version:
 Author: ShuaiLei
 Date: 2023-11-03 09:28:54
 LastEditors: ShuaiLei
-LastEditTime: 2024-01-18 21:20:15
+LastEditTime: 2024-06-20 03:02:56
 '''
 import json
 from pycocotools.coco import COCO
@@ -141,7 +141,6 @@ class Pre_coco2Label_studio(Pre_coco):
                                                 }
                                               ]
                     self.label_studio_dataset.append(img_info)
-
 
 
     def save_conver_result(self, save_path):

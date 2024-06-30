@@ -886,7 +886,7 @@ class Trainer(object):
             # ---------------------------------------------------------------------------------------------------------------------
 
             # 根据真实的bbox_test.json修改imid
-            modify_bbox_json_imid(self.dataset.get_anno(), imid2path, output_dir)
+            # modify_bbox_json_imid(self.dataset.get_anno(), imid2path, output_dir)
 
         return results
 

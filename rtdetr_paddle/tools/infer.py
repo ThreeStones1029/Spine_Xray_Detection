@@ -226,12 +226,12 @@ def main(FLAGS):
 if __name__ == '__main__':
 
     FLAGS = parse_args()
-    FLAGS.infer_dir = "datasets/miccai/xray/images1/train_60"
-    # FLAGS.infer_img = "datasets/BUU/sample/train/0001-F-037Y0.jpg"
-    FLAGS.output_dir = "infer_output/miccai/xray/fold1/semantic_20_drr_buu_pretrain/rtdetr50"
-    FLAGS.draw_threshold = 0.6
-    FLAGS.weights = "output/xray/fold1/semantic_20_drr_buu_pretrain/rtdetr_r50vd_6x_coco1/best_model.pdparams"
-    FLAGS.use_vdl = False
-    FLAGS.save_results = True
+    # FLAGS.infer_dir = "/home/efficientnetV2/dataset/spine_fracture/LA_preoperative_xray_fracture/vindr-spinex"
+    # # FLAGS.infer_img = "datasets/BUU/sample/train/0001-F-037Y0.jpg"
+    # FLAGS.output_dir = "infer_output/LA_preoperative_xray_fracture"
+    # FLAGS.draw_threshold = 0.6
+    # FLAGS.weights = "/home/RT-DETR/rtdetr_paddle/output/miccai/buu/drr_pretrain/rtdetr_r50vd_6x_coco/best_model.pdparams"
+    # FLAGS.use_vdl = False
+    # FLAGS.save_results = True
     main(FLAGS)
     

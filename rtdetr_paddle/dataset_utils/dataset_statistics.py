@@ -4,7 +4,7 @@ version:
 Author: ShuaiLei
 Date: 2023-11-11 10:56:44
 LastEditors: ShuaiLei
-LastEditTime: 2024-03-12 10:23:19
+LastEditTime: 2024-06-28 07:36:10
 '''
 import json
 import os
@@ -144,7 +144,9 @@ if __name__ == "__main__":
     #                   save_json_file="datasets/miccai/xray/annotations/xray_instance_statistic.json")
 
     # miccai BUU5800数据集标注信息分布
-    DatasetStatistics(annotation_file="datasets/miccai/BUU/annotations/buu_5800.json",
-                      save_json_file="datasets/miccai/BUU/annotations/buu_5800_statistic.json")
+    # DatasetStatistics(annotation_file="datasets/miccai/BUU/annotations/buu_5800.json",
+    #                   save_json_file="datasets/miccai/BUU/annotations/buu_5800_statistic.json")
 
-    # verse drr9800数据集标注信息分布
+    # xray20240119数据集标注信息分布
+    DatasetStatistics(annotation_file="datasets/xray20240119/annotations/train_instance.json",
+                      save_json_file="datasets/xray20240119/annotations/train_instance_statistics.json")

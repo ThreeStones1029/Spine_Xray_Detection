@@ -169,7 +169,7 @@ def assign_images_split(input_root, output_root):
     手动划分数据集后,根据图片名称划分json文件
     """
     # 数据集路径
-    annotations_path = os.path.join(input_root,"annotations" ,"semantic.json")
+    annotations_path = os.path.join(input_root,"annotations" ,"instance.json")
 
     # 输出路径
     os.makedirs(output_root, exist_ok=True)
@@ -250,9 +250,9 @@ if __name__ == "__main__":
     # split_train_dataset_to_no_label_and_label("datasets/miccai/xray/images/train_instance",
     #                                           "datasets/miccai/xray/images/train_instance_60",
     #                                           "datasets/miccai/xray/images/train_instance_20")
-    # random_split_coco_dataset("datasets/fracture_dataset/images",
-    #                           "datasets/fracture_dataset/annotations/semantic.json",
-    #                           "datasets/fracture_dataset/split_dataset",
+    # random_split_coco_dataset("datasets/Fracture_dataset/images",
+    #                           "datasets/Fracture_dataset/annotations/fracture.json",
+    #                           "datasets/Fracture_dataset/split_dataset",
     #                           {"train": 0.6, "val": 0.2, "test": 0.2})
 
-    assign_images_split("datasets/fracture_dataset", "datasets/fracture_dataset")
+    assign_images_split("datasets/Fracture_dataset", "datasets/Fracture_dataset")

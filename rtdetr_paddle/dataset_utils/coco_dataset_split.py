@@ -250,9 +250,9 @@ if __name__ == "__main__":
     # split_train_dataset_to_no_label_and_label("datasets/miccai/xray/images/train_instance",
     #                                           "datasets/miccai/xray/images/train_instance_60",
     #                                           "datasets/miccai/xray/images/train_instance_20")
-    # random_split_coco_dataset("datasets/Fracture_dataset/images",
-    #                           "datasets/Fracture_dataset/annotations/fracture.json",
-    #                           "datasets/Fracture_dataset/split_dataset",
-    #                           {"train": 0.6, "val": 0.2, "test": 0.2})
+    random_split_coco_dataset("datasets/LA_preoperative_xray_fracture/images",
+                              "datasets/LA_preoperative_xray_fracture/annotations/LA_preoperative_xray_fracture.json",
+                              "datasets/LA_preoperative_xray_fracture/split_dataset",
+                              {"train": 0.6, "val": 0.2, "test": 0.2})
 
-    assign_images_split("datasets/Fracture_dataset", "datasets/Fracture_dataset")
+    # assign_images_split("datasets/Fracture_dataset", "datasets/Fracture_dataset")

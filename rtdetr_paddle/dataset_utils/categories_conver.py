@@ -4,7 +4,7 @@ version:
 Author: ThreeStones1029 2320218115@qq.com
 Date: 2024-04-13 11:18:33
 LastEditors: ShuaiLei
-LastEditTime: 2024-06-30 06:52:02
+LastEditTime: 2024-07-01 07:59:14
 '''
 import json
 import sys
@@ -76,12 +76,10 @@ if __name__ == "__main__":
     # vis = VisCoCo(annotation_file="datasets/Fracture_dataset/annotations/fracture_gt_bbox.json",
     #               images_folder="datasets/Fracture_dataset/images", 
     #               bbox_vis_folder="datasets/Fracture_dataset/vis_fracture").visualize_bboxes_in_images()
-    fracture_categories_conver_to_semantic_categories("datasets/LA_preoperative_xray_fracture/annotations/fracture_bbox_train.json",
-                                                      "datasets/LA_preoperative_xray_fracture/annotations/semantic_bbox_train.json")
-    fracture_categories_conver_to_semantic_categories("datasets/LA_preoperative_xray_fracture/annotations/fracture_bbox_val.json",
-                                                      "datasets/LA_preoperative_xray_fracture/annotations/semantic_bbox_val.json")
-    fracture_categories_conver_to_semantic_categories("datasets/LA_preoperative_xray_fracture/annotations/fracture_bbox_test.json",
-                                                      "datasets/LA_preoperative_xray_fracture/annotations/semantic_bbox_test.json")
+    fracture_categories_conver_to_semantic_categories("datasets/LA_xray_fracture/annotations/fracture_bbox_train.json",
+                                                      "datasets/LA_xray_fracture/annotations/semantic_bbox_train.json")
+    fracture_categories_conver_to_semantic_categories("datasets/LA_xray_fracture/annotations/fracture_bbox_val.json",
+                                                      "datasets/LA_xray_fracture/annotations/semantic_bbox_val.json")
     # vis = VisCoCo(annotation_file="datasets/Fracture_dataset/annotations/fracture_bbox_test.json", 
     #               images_folder="datasets/Fracture_dataset/test", 
     #               bbox_vis_folder="datasets/Fracture_dataset/vis").visualize_bboxes_in_images()

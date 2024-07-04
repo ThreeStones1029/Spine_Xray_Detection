@@ -4,7 +4,7 @@ version: 1.0
 Author: ShuaiLei
 Date: 2023-10-24 14:21:48
 LastEditors: ShuaiLei
-LastEditTime: 2024-06-30 06:38:13
+LastEditTime: 2024-07-01 03:02:28
 
 
 BUU datasets annotations format:
@@ -209,7 +209,7 @@ if __name__ == "__main__":
 
     # print(len(choose_ids))
 
-    conversion = Min_json2coco(annotation_file="datasets/project-21-at-2024-06-30-04-20-534e620c.json", 
+    conversion = Min_json2coco(annotation_file="datasets/LA_preoperative_xray_fracture/annotations/project-21-at-2024-06-30-04-20-534e620c.json", 
                                choose_ids='all',
                                is_del_hard=False,
                                save_path="datasets/LA_preoperative_xray_fracture.json")

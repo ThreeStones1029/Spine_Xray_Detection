@@ -20,9 +20,14 @@ def random_split_coco_dataset(images_folder_path, annotation_file, output_folder
     end_index = 0
     def filter_annotations(annotations, image_ids):
         return [ann for ann in annotations if ann["image_id"] in image_ids]
-    for split_part_name, ratio in split_info_dict.items():
-        end_index += int(ratio * len(dataset["images"]))
-        split_part_images = dataset["images"][start_index:end_index]
+    for i, split_part in enumerate(split_info_dict.items()):
+        split_part_name = split_part[0]
+        ratio = split_part[1]
+        if i == len(split_info_dict.items()) - 1:
+            split_part_images = dataset["images"][start_index:]
+        else:
+            end_index += int(ratio * len(dataset["images"]))
+            split_part_images = dataset["images"][start_index:end_index]
         start_index += int(ratio * len(dataset["images"]))
         split_part_folder = os.path.join(output_folder_path, split_part_name)
         os.makedirs(split_part_folder, exist_ok=True)
@@ -250,9 +255,9 @@ if __name__ == "__main__":
     # split_train_dataset_to_no_label_and_label("datasets/miccai/xray/images/train_instance",
     #                                           "datasets/miccai/xray/images/train_instance_60",
     #                                           "datasets/miccai/xray/images/train_instance_20")
-    random_split_coco_dataset("datasets/LA_preoperative_xray_fracture/images",
-                              "datasets/LA_preoperative_xray_fracture/annotations/LA_preoperative_xray_fracture.json",
-                              "datasets/LA_preoperative_xray_fracture/split_dataset",
-                              {"train": 0.6, "val": 0.2, "test": 0.2})
+    random_split_coco_dataset("datasets/LA_xray_fracture/images",
+                              "datasets/LA_xray_fracture/annotations/LA_xray_fracture.json",
+                              "datasets/LA_xray_fracture/split_dataset",
+                              {"train": 0.7, "val": 0.3})
 
     # assign_images_split("datasets/Fracture_dataset", "datasets/Fracture_dataset")

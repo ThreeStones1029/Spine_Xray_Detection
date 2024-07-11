@@ -4,7 +4,7 @@ version:
 Author: ShuaiLei
 Date: 2023-11-03 09:28:54
 LastEditors: ShuaiLei
-LastEditTime: 2024-06-20 03:02:56
+LastEditTime: 2024-07-11 06:48:30
 '''
 import json
 from pycocotools.coco import COCO
@@ -149,6 +149,6 @@ class Pre_coco2Label_studio(Pre_coco):
 
 
 if __name__ == "__main__":
-    label_studio = Pre_coco2Label_studio("/home/jjf/Desktop/SymbolicSystem/infer_output/XJT/logic/rtdetr/logic_bbox.json",
-                                         "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/datasets/XJT20231101/all_conver")
-    label_studio.conver_and_save("/home/jjf/Desktop/SymbolicSystem/infer_output/XJT/logic/rtdetr/label_studio_logic_bbox.json")
+    label_studio = Pre_coco2Label_studio("infer_output/XJT/logic/rtdetr/logic_bbox.json",
+                                         "datasets/XJT20231101/all_conver")
+    label_studio.conver_and_save("infer_output/XJT/logic/rtdetr/label_studio_logic_bbox.json")

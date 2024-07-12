@@ -119,9 +119,9 @@ def no_random_split_coco_dataset():
     annotations = annotations_data["annotations"]
     categories = annotations_data["categories"]
     # 选定图片作为训练集、验证集（从指定json文件里面选）
-    train_json_path = "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/datasets/Real_Label/annotations/bbox_train.json"
-    val_json_path = "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/datasets/Real_Label/annotations/bbox_val.json"
-    test_json_path = "/home/jjf/Desktop/RT-DETR/rtdetr_paddle/datasets/Real_Label/annotations/bbox_test.json"
+    train_json_path = "/home/RT-DETR/rtdetr_paddle/datasets/Real_Label/annotations/bbox_train.json"
+    val_json_path = "/home/RT-DETR/rtdetr_paddle/datasets/Real_Label/annotations/bbox_val.json"
+    test_json_path = "/home/RT-DETR/rtdetr_paddle/datasets/Real_Label/annotations/bbox_test.json"
     def load_json(json_path):
         with open(json_path, "r") as f:
             annotations_data = json.load(f)
@@ -169,12 +169,12 @@ def no_random_split_coco_dataset():
     print("数据集划分完成！")
 
 
-def assign_images_split(input_root, output_root):
+def assign_images_split(input_root, annotation_file, output_root):
     """
     手动划分数据集后,根据图片名称划分json文件
     """
     # 数据集路径
-    annotations_path = os.path.join(input_root,"annotations" ,"instance.json")
+    annotations_path = os.path.join(input_root,"annotations" ,annotation_file)
 
     # 输出路径
     os.makedirs(output_root, exist_ok=True)
@@ -250,14 +250,32 @@ def split_train_dataset_to_no_label_and_label(train_folder, train_no_label_folde
             shutil.copy(os.path.join(train_folder, file), os.path.join(train_no_label_folder, file))
 
 
+def TD20240705_LA_dataset_split():
+    """
+    手动划分好图片再分数据集json
+    """
+    fracture = {"bimeihua": 4, "caiyumei": 6, "dingjunmei": 4, "lijiling": 14, "liusuzhen": 14, 
+                "miaoqilan": 18, "wangxiuhua": 18, "wanjiarong": 18, "zhangyebao": 16, "zhoukelan": 18}
+    normal = {"hukaixiu": 15, "lishuying": 16, "liujiacai": 6, "liyan": 14, "peizongping": 18, 
+              "pengcuilian": 10, "qiaojigang": 18, "weilanhua": 15, "yangdongmei": 11, "zhangcuiying": 2, "zhangcuiyyy":3}
+    
+    train = {"fracture": ["bimeihua", "lijiling", "wangxiuhua", "caiyumei", "zhangyebao", "dingjunmei"],
+             "normal": ["hukaixiu", "liujiacai", "pengcuilian", "weilanhua", "yangdongmei", "zhangcuiying", "zhangcuiyyy"]}
+    
+    val = {"fracture": ["wanjiarong", "liusuzhen"], 
+           "normal": ["lishuying", "peizongping"]}
+
+    test ={"fracture": ["zhoukelan", "miaoqilan"], 
+           "normal": ["liyan", "qiaojigang"]}
+
 if __name__ == "__main__":
     # no_random_split_coco_dataset()
     # split_train_dataset_to_no_label_and_label("datasets/miccai/xray/images/train_instance",
     #                                           "datasets/miccai/xray/images/train_instance_60",
     #                                           "datasets/miccai/xray/images/train_instance_20")
-    random_split_coco_dataset("datasets/LA_xray_fracture/images",
-                              "datasets/LA_xray_fracture/annotations/LA_xray_fracture.json",
-                              "datasets/LA_xray_fracture/split_dataset",
-                              {"train": 0.7, "val": 0.3})
+    # random_split_coco_dataset("datasets/LA_xray_fracture/images",
+    #                           "datasets/LA_xray_fracture/annotations/LA_xray_fracture.json",
+    #                           "datasets/LA_xray_fracture/split_dataset",
+    #                           {"train": 0.7, "val": 0.3})
 
-    # assign_images_split("datasets/Fracture_dataset", "datasets/Fracture_dataset")
+    assign_images_split("datasets/TD20240705_LA/split_dataset", "TD20240705_LA_coco.json","datasets/TD20240705_LA/split_dataset")

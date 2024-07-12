@@ -4,7 +4,7 @@ version:
 Author: ThreeStones1029 221620010039@hhu.edu.cn
 Date: 2024-01-17 17:10:49
 LastEditors: ShuaiLei
-LastEditTime: 2024-07-11 15:25:38
+LastEditTime: 2024-07-12 01:40:47
 '''
 import cv2
 import os
@@ -184,7 +184,9 @@ if __name__ == "__main__":
     # crop_image_black_edge("datasets/NT20240408/case2_LAT.png", "datasets/NT20240408/case2_LAT.png")
 
     # TD20240705
-    conver_tiffs2pngs("datasets/TD_LA_fracture/fracture", "datasets/TD_LA_fracture/fracture")
-    conver_tiffs2pngs("datasets/TD_LA_fracture/normal", "datasets/TD_LA_fracture/normal")
-    # rotate_images("datasets/TD_fracture_18", "datasets/TD_fracture_18")
-    # blackwhite_inverse_images("datasets/TD_fracture_18", "datasets/TD_fracture_18")
+    # conver_tiffs2pngs("datasets/TD20240705_LA/fracture", "datasets//TD20240705_LA/fracture")
+    # conver_tiffs2pngs("datasets//TD20240705_LA/normal", "datasets//TD20240705_LA/normal")
+    # rotate_images("datasets/TD20240705_LA/fracture", "datasets/TD20240705_LA/fracture")
+    # rotate_images("datasets/TD20240705_LA/normal", "datasets/TD20240705_LA/normal")
+    blackwhite_inverse_images("datasets/TD20240705_LA/fracture", "datasets/TD20240705_LA/fracture")
+    blackwhite_inverse_images("datasets/TD20240705_LA/normal", "datasets/TD20240705_LA/normal")

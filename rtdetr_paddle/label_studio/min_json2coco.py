@@ -4,7 +4,7 @@ version: 1.0
 Author: ShuaiLei
 Date: 2023-10-24 14:21:48
 LastEditors: ShuaiLei
-LastEditTime: 2024-07-01 03:02:28
+LastEditTime: 2024-07-12 11:58:38
 
 
 BUU datasets annotations format:
@@ -56,7 +56,7 @@ class Min_json2coco:
         self.save_dataset()
 
     def add_info(self):
-        self.info = {"description": "This dataset is labeled as visible to the human eye and labeled: C1-L5,pelvis",
+        self.info = {"description": "This dataset is labeled as visible to the human eye and labeled: normal,fracture",
                      "contribute": "Shuai lei",
                      "version": "1.0",
                      "date": datetime.today().strftime('%Y-%m-%d')}
@@ -104,8 +104,8 @@ class Min_json2coco:
                     if "sentiment" not in img_info.keys() or ("sentiment" in img_info.keys() and img_info["sentiment"] == "False"): # 排除标注困难的
                         img = {}
                         img['id'] = img_info['id']
-                        img['type'] = img_info['type']
-                        img['L4L6'] = img_info['L4L6']
+                        # img['type'] = img_info['type']
+                        # img['L4L6'] = img_info['L4L6']
                         img['file_name'] = os.path.basename(img_info['img'])
                         img['width'] = img_info["bbox"][0]['original_width']
                         img['height'] = img_info["bbox"][0]['original_height']
@@ -113,8 +113,8 @@ class Min_json2coco:
                 else:
                     img = {}
                     img['id'] = img_info['id']
-                    img['type'] = img_info['type']
-                    img['L4L6'] = img_info['L4L6']
+                    # img['type'] = img_info['type']
+                    # img['L4L6'] = img_info['L4L6']
                     img['file_name'] = os.path.basename(img_info['img'])
                     img['width'] = img_info["bbox"][0]['original_width']
                     img['height'] = img_info["bbox"][0]['original_height']
@@ -209,9 +209,9 @@ if __name__ == "__main__":
 
     # print(len(choose_ids))
 
-    conversion = Min_json2coco(annotation_file="datasets/LA_preoperative_xray_fracture/annotations/project-21-at-2024-06-30-04-20-534e620c.json", 
+    conversion = Min_json2coco(annotation_file="datasets/TD20240705_LA/split_dataset/annotations/TD20240705_LA_minjson.json", 
                                choose_ids='all',
                                is_del_hard=False,
-                               save_path="datasets/LA_preoperative_xray_fracture.json")
+                               save_path="datasets/TD20240705_LA/split_dataset/annotations/TD20240705_LA_coco.json")
 
     print(len(conversion.imgs))

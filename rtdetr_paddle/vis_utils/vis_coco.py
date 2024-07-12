@@ -237,8 +237,8 @@ if __name__ == "__main__":
     # vis = VisCoCo("datasets/miccai/buu/annotations/buu_5800_val.json", "datasets/miccai/buu/val", "datasets/miccai/buu/vis")
     # vis.visualize_bboxes_in_image(os.path.join("datasets/miccai/buu/val", "0126-F-026Y1.jpg"))
 
-    vis = VisCoCo("datasets/LA_xray_fracture/annotations/fracture_bbox_train.json", 
-                    "datasets/LA_xray_fracture/train", 
-                    "datasets/LA_xray_fracture/train_gt")
+    vis = VisCoCo("datasets/TD20240705_LA/split_dataset/annotations/fracture_bbox_val.json", 
+                    "datasets/TD20240705_LA/split_dataset/val", 
+                    "datasets/TD20240705_LA/split_dataset/val_gt")
     vis.visualize_bboxes_in_images()
 

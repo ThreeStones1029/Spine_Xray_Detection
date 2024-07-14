@@ -1,9 +1,12 @@
 import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.getcwd()), "rtdetr_paddle"))
 import json
 import numpy as np
 import shutil
 from datetime import datetime
 from json_process import load_json_file, save_json_file
+from utils.io.common import create_folder
     
     
 def random_split_coco_dataset(images_folder_path, annotation_file, output_folder_path, split_info_dict):
@@ -110,8 +113,7 @@ def no_random_split_coco_dataset():
     output_root = os.path.join(dataset_root, "split_dataset")
     os.makedirs(output_root, exist_ok=True)
     # 读取annotations.json文件
-    with open(annotations_path, "r") as f:
-        annotations_data = json.load(f)
+    annotations_data = load_json_file(annotations_path)
     # 提取images, annotations, categories
     info = annotations_data["info"]
     info['date'] = datetime.today().strftime('%Y-%m-%d')
@@ -134,12 +136,9 @@ def no_random_split_coco_dataset():
     val_info, val_images, val_annotations, val_categories = load_json(val_json_path)
     test_info, test_images, test_annotations, test_categories = load_json(test_json_path)
     # 分别为训练集、验证集和测试集创建子文件夹
-    train_folder = os.path.join(output_root, "train")
-    val_folder = os.path.join(output_root, "val")
-    test_folder = os.path.join(output_root, "test")
-    os.makedirs(train_folder, exist_ok=True)
-    os.makedirs(val_folder, exist_ok=True)
-    os.makedirs(test_folder, exist_ok=True)
+    train_folder = create_folder(os.path.join(output_root, "train"))
+    val_folder = create_folder(os.path.join(output_root, "val"))
+    test_folder = create_folder(os.path.join(output_root, "test"))
     # 将图片文件复制到相应的子文件夹
     for img in train_images:
         shutil.copy(os.path.join(images_folder, img["file_name"]), os.path.join(train_folder, img["file_name"]))
@@ -157,14 +156,11 @@ def no_random_split_coco_dataset():
     train_json = {"info": info, "images": train_images, "annotations": train_ann, "categories": categories}
     val_json = {"info": info, "images": val_images, "annotations": val_ann, "categories": categories}
     test_json = {"info": info, "images": test_images, "annotations": test_ann, "categories": categories}
-    with open(os.path.join(output_root,"bbox_train.json"), "w") as f:
-        json.dump(train_json, f)
+    save_json_file(train_json, os.path.join(output_root,"bbox_train.json"))
     modify_json(os.path.join(output_root,"bbox_train.json"))
-    with open(os.path.join(output_root, "bbox_val.json"), "w") as f:
-        json.dump(val_json, f)
+    save_json_file(val_json, os.path.join(output_root,"bbox_val.json"))
     modify_json(os.path.join(output_root,"bbox_val.json"))
-    with open(os.path.join(output_root, "bbox_test.json"), "w") as f:
-        json.dump(test_json, f)
+    save_json_file(test_json, os.path.join(output_root,"bbox_test.json"))
     modify_json(os.path.join(output_root,"bbox_test.json"))
     print("数据集划分完成！")
 
@@ -173,22 +169,15 @@ def assign_images_split(input_root, annotation_file, output_root):
     """
     手动划分数据集后,根据图片名称划分json文件
     """
-    # 数据集路径
-    annotations_path = os.path.join(input_root,"annotations" ,annotation_file)
-
     # 输出路径
     os.makedirs(output_root, exist_ok=True)
     # 读取annotations.json文件
-    with open(annotations_path, "r") as f:
-        annotations_data = json.load(f)
+    annotations_data = load_json_file(annotation_file)
     # 提取images, annotations, categories
     images = annotations_data["images"]
     annotations = annotations_data["annotations"]
     categories = annotations_data["categories"]
-    # 选定图片作为训练集、验证集（从指定json文件里面选）
-    assign_train_images_path = os.path.join(input_root, "train")
-    assign_val_images_path = os.path.join(input_root, "val")
-    assign_test_images_path = os.path.join(input_root, "test")
+
     def get_images(assign_images_path, images):
         assign_images = []
         for root, dirs, files in os.walk(assign_images_path):
@@ -196,26 +185,30 @@ def assign_images_split(input_root, annotation_file, output_root):
                 if img["file_name"] in files:
                     assign_images.append(img)
         return assign_images
-    train_images = get_images(assign_train_images_path, images)
-    val_images = get_images(assign_val_images_path, images)
-    test_images = get_images(assign_test_images_path, images)
-
+    
     # 根据图片id分配annotations
     def filter_annotations(annotations, image_ids):
         return [ann for ann in annotations if ann["image_id"] in image_ids]
+    
+    assign_train_images_path = os.path.join(input_root, "train")
+    train_images = get_images(assign_train_images_path, images)
     train_ann = filter_annotations(annotations, [img["id"] for img in train_images])
-    val_ann = filter_annotations(annotations, [img["id"] for img in val_images])
-    test_ann = filter_annotations(annotations, [img["id"] for img in test_images])
-    # 生成train.json, val.json, test.json
     train_json = {"info": annotations_data["info"], "images": train_images, "annotations": train_ann, "categories": categories}
+    save_json_file(train_json, os.path.join(output_root,"bbox_train.json"))
+
+    assign_val_images_path = os.path.join(input_root, "val")
+    val_images = get_images(assign_val_images_path, images)
+    val_ann = filter_annotations(annotations, [img["id"] for img in val_images])
     val_json = {"info": annotations_data["info"], "images": val_images, "annotations": val_ann, "categories": categories}
-    test_json = {"info": annotations_data["info"], "images": test_images, "annotations": test_ann, "categories": categories}
-    with open(os.path.join(output_root,"bbox_train.json"), "w") as f:
-        json.dump(train_json, f)
-    with open(os.path.join(output_root, "bbox_val.json"), "w") as f:
-        json.dump(val_json, f)
-    with open(os.path.join(output_root, "bbox_test.json"), "w") as f:
-        json.dump(test_json, f)
+    save_json_file(val_json, os.path.join(output_root,"bbox_val.json"))
+
+    if os.path.exists(os.path.join(input_root, "test")):
+        assign_test_images_path = os.path.join(input_root, "test")
+        test_images = get_images(assign_test_images_path, images)
+        test_ann = filter_annotations(annotations, [img["id"] for img in test_images])
+        test_json = {"info": annotations_data["info"], "images": test_images, "annotations": test_ann, "categories": categories}
+        save_json_file(test_json, os.path.join(output_root,"bbox_test.json"))
+
     print("数据集划分完成！")
 
 
@@ -257,7 +250,7 @@ def TD20240705_LA_dataset_split():
     fracture = {"bimeihua": 4, "caiyumei": 6, "dingjunmei": 4, "lijiling": 14, "liusuzhen": 14, 
                 "miaoqilan": 18, "wangxiuhua": 18, "wanjiarong": 18, "zhangyebao": 16, "zhoukelan": 18}
     normal = {"hukaixiu": 15, "lishuying": 16, "liujiacai": 6, "liyan": 14, "peizongping": 18, 
-              "pengcuilian": 10, "qiaojigang": 18, "weilanhua": 15, "yangdongmei": 11, "zhangcuiying": 2, "zhangcuiyyy":3}
+              "pengcuilian": 10, "weilanhua": 15, "qiaojigang": 18, "yangdongmei": 11, "zhangcuiyyy":3}
     
     train = {"fracture": ["bimeihua", "lijiling", "wangxiuhua", "caiyumei", "zhangyebao", "dingjunmei"],
              "normal": ["hukaixiu", "liujiacai", "pengcuilian", "weilanhua", "yangdongmei", "zhangcuiying", "zhangcuiyyy"]}
@@ -265,8 +258,64 @@ def TD20240705_LA_dataset_split():
     val = {"fracture": ["wanjiarong", "liusuzhen"], 
            "normal": ["lishuying", "peizongping"]}
 
-    test ={"fracture": ["zhoukelan", "miaoqilan"], 
-           "normal": ["liyan", "qiaojigang"]}
+
+def KFoldsplit_dataset_according_case(fracture_folder, normal_folder, annotation_file, output_folder):
+    """
+    根据病人划分数据集
+    """
+    fracture = {"bimeihua": 4, "caiyumei": 6, "dingjunmei": 4, "lijiling": 14, "liusuzhen": 14, 
+                "miaoqilan": 18, "wangxiuhua": 18, "wanjiarong": 18, "zhangyebao": 16, "zhoukelan": 18}
+    normal = {"hukaixiu": 15, "lishuying": 16, "liujiacai": 6, "liyan": 14, "peizongping": 18, 
+              "pengcuilian": 10, "weilanhua": 15, "qiaojigang": 18, "yangdongmei": 11, "zhangcuiyyy":3}
+    
+    fold1_val_case_list = ["bimeihua", "miaoqilan", "hukaixiu", "pengcuilian"]
+
+    fold2_val_case_list = ["caiyumei", "wangxiuhua", "lishuying", "weilanhua"]
+
+    fold3_val_case_list = ["dingjunmei", "wanjiarong", "liujiacai", "qiaojigang"]
+
+    fold4_val_case_list = ["lijiling", "zhangyebao", "liyan", "yangdongmei"]
+
+    fold5_val_case_list = ["liusuzhen", "zhoukelan", "peizongping", "zhangcuiyyy"]
+
+    fold1_val_folder = create_folder(os.path.join(output_folder, "fold1", "val"))
+    fold1_train_folder = create_folder(os.path.join(output_folder, "fold1", "train"))
+    fold2_val_folder = create_folder(os.path.join(output_folder, "fold2", "val"))
+    fold2_train_folder = create_folder(os.path.join(output_folder, "fold2", "train"))
+    fold3_val_folder = create_folder(os.path.join(output_folder, "fold3", "val"))
+    fold3_train_folder = create_folder(os.path.join(output_folder, "fold3", "train"))
+    fold4_val_folder = create_folder(os.path.join(output_folder, "fold4", "val"))
+    fold4_train_folder = create_folder(os.path.join(output_folder, "fold4", "train"))
+    fold5_val_folder = create_folder(os.path.join(output_folder, "fold5", "val"))
+    fold5_train_folder = create_folder(os.path.join(output_folder, "fold5", "train"))
+
+    def copy_images(fracture_folder, normal_folder, fold_val_case_list, output_val_folder, output_train_folder):
+        for filename in os.listdir(fracture_folder):
+            filename_with_no_ext = filename.split("_")[0]
+            if filename_with_no_ext in fold_val_case_list:
+                shutil.copy(os.path.join(fracture_folder, filename), os.path.join(output_val_folder,filename))
+            else:
+                shutil.copy(os.path.join(fracture_folder, filename), os.path.join(output_train_folder,filename))
+
+        for filename in os.listdir(normal_folder):
+            filename_with_no_ext = filename.split("_")[0]
+            if filename_with_no_ext in fold_val_case_list:
+                shutil.copy(os.path.join(normal_folder, filename), os.path.join(output_val_folder,filename))
+            else:
+                shutil.copy(os.path.join(normal_folder, filename), os.path.join(output_train_folder,filename))
+
+    copy_images(fracture_folder, normal_folder, fold1_val_case_list, fold1_val_folder, fold1_train_folder)
+    copy_images(fracture_folder, normal_folder, fold2_val_case_list, fold2_val_folder, fold2_train_folder)
+    copy_images(fracture_folder, normal_folder, fold3_val_case_list, fold3_val_folder, fold3_train_folder)
+    copy_images(fracture_folder, normal_folder, fold4_val_case_list, fold4_val_folder, fold4_train_folder)
+    copy_images(fracture_folder, normal_folder, fold5_val_case_list, fold5_val_folder, fold5_train_folder)
+
+    assign_images_split(os.path.join(output_folder, "fold1"), annotation_file, os.path.join(output_folder, "fold1", "annotations"))
+    assign_images_split(os.path.join(output_folder, "fold2"), annotation_file, os.path.join(output_folder, "fold2", "annotations"))
+    assign_images_split(os.path.join(output_folder, "fold3"), annotation_file, os.path.join(output_folder, "fold3", "annotations"))
+    assign_images_split(os.path.join(output_folder, "fold4"), annotation_file, os.path.join(output_folder, "fold4", "annotations"))
+    assign_images_split(os.path.join(output_folder, "fold5"), annotation_file, os.path.join(output_folder, "fold5", "annotations"))
+
 
 if __name__ == "__main__":
     # no_random_split_coco_dataset()
@@ -278,4 +327,8 @@ if __name__ == "__main__":
     #                           "datasets/LA_xray_fracture/split_dataset",
     #                           {"train": 0.7, "val": 0.3})
 
-    assign_images_split("datasets/TD20240705_LA/split_dataset", "TD20240705_LA_coco.json","datasets/TD20240705_LA/split_dataset")
+    # assign_images_split("datasets/TD20240705_LA/split_dataset", "TD20240705_LA_coco.json","datasets/TD20240705_LA/split_dataset")
+    KFoldsplit_dataset_according_case("datasets/TD20240705_LA/fracture", 
+                                      "datasets/TD20240705_LA/normal", 
+                                      "datasets/TD20240705_LA/split_dataset/annotations/TD20240705_LA_coco.json", 
+                                      "datasets/TD20240705_LA/split_dataset")
